@@ -306,6 +306,10 @@ onMounted(async () => {
     })
     if (data.profile) {
       profileForm.value = { ...data.profile }
+      // Sync photo to auth store so widget shows it immediately
+      if (data.profile.photo_url) {
+        authStore.user = { ...authStore.user, photo: data.profile.photo_url }
+      }
     }
     if (data.educations) {
       educations.value = data.educations
@@ -322,7 +326,7 @@ onMounted(async () => {
 const onPhotoChange = (e: Event) => {
   const target = e.target as HTMLInputElement
   if (target.files && target.files[0]) {
-    profileForm.value.photo_file = target.files[0]
+    profileForm.value.photo = target.files[0]
   }
 }
 
@@ -336,16 +340,23 @@ const saveProfile = async () => {
     
     // Append all properties to FormData
     for (const key in profileForm.value) {
-      if (profileForm.value[key] !== null && profileForm.value[key] !== undefined) {
-        formData.append(key, profileForm.value[key] === true ? '1' : (profileForm.value[key] === false ? '0' : profileForm.value[key]))
-      }
+      const val = profileForm.value[key]
+      if (val === null || val === undefined) continue
+      // Only send 'photo' if it's a new File — skip the existing path string
+      if (key === 'photo' && !(val instanceof File)) continue
+      formData.append(key, val === true ? '1' : (val === false ? '0' : val))
     }
 
-    await $fetch('http://127.0.0.1:8000/api/applicant/profile', {
+    const response = await $fetch<any>('http://127.0.0.1:8000/api/applicant/profile', {
       method: 'POST',
       headers: { Authorization: `Bearer ${authStore.token}` },
       body: formData
     })
+
+    // Update auth store so the widget avatar reflects the new photo immediately
+    if (response?.profile?.photo_url) {
+      authStore.user = { ...authStore.user, photo: response.profile.photo_url }
+    }
     
     profileSuccess.value = true
     setTimeout(() => profileSuccess.value = false, 3000)

@@ -1,122 +1,124 @@
 <template>
-  <div class="space-y-8">
-    <!-- Profile & Stats Header -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      
+  <div class="space-y-4">
+
+    <!-- Row 1: Profile Card + Compact Stat Cards -->
+    <div class="flex flex-col lg:flex-row gap-4 items-stretch">
+
       <!-- User Profile Card -->
-      <div class="lg:col-span-4 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-8 text-white shadow-2xl relative overflow-hidden border border-slate-700/50 group">
-        <!-- Decorative Background Elements -->
-        <div class="absolute -right-12 -top-12 w-40 h-40 bg-primary-500/20 rounded-full blur-3xl transition-transform duration-700 group-hover:scale-150"></div>
-        <div class="absolute -left-12 -bottom-12 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl transition-transform duration-700 group-hover:scale-150"></div>
+      <div class="lg:w-72 shrink-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl px-6 py-4 text-white shadow-xl relative overflow-hidden border border-slate-700/50 group">
+        <div class="absolute -right-8 -top-8 w-28 h-28 bg-primary-500/20 rounded-full blur-2xl transition-transform duration-700 group-hover:scale-150"></div>
+        <div class="absolute -left-8 -bottom-8 w-28 h-28 bg-blue-500/20 rounded-full blur-2xl transition-transform duration-700 group-hover:scale-150"></div>
         <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 mix-blend-overlay"></div>
         
-        <div class="relative z-10 flex flex-col items-center text-center mt-2">
-          <!-- Avatar with Glowing Ring -->
-          <div class="relative mb-5">
+        <div class="relative z-10 flex items-center gap-4">
+          <!-- Avatar -->
+          <div class="relative shrink-0">
             <div class="absolute inset-0 bg-gradient-to-r from-primary-400 to-blue-500 rounded-full blur opacity-50 group-hover:opacity-100 transition-opacity duration-500"></div>
-            <div class="relative w-28 h-28 bg-slate-800 rounded-full border-4 border-slate-700 flex items-center justify-center text-4xl font-black shadow-inner overflow-hidden z-10">
-              <span v-if="!authStore.user?.photo" class="bg-gradient-to-br from-white to-slate-400 bg-clip-text text-transparent">{{ authStore.user?.name?.charAt(0).toUpperCase() }}</span>
+            <div class="relative w-14 h-14 bg-slate-800 rounded-full border-2 border-slate-600 flex items-center justify-center text-xl font-black shadow-inner overflow-hidden z-10">
+              <img v-if="authStore.user?.photo" :src="authStore.user.photo" alt="Profile photo" class="w-full h-full object-cover" />
+              <span v-else class="bg-gradient-to-br from-white to-slate-400 bg-clip-text text-transparent">{{ authStore.user?.name?.charAt(0).toUpperCase() }}</span>
             </div>
-            <!-- Quick edit button overlay -->
-            <button @click="activeTab = 'profile'" class="absolute bottom-0 right-0 z-20 bg-primary-600 hover:bg-primary-500 text-white p-2 rounded-full shadow-lg border-2 border-slate-800 transition-transform hover:scale-110">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+            <button @click="activeTab = 'profile'" class="absolute -bottom-0.5 -right-0.5 z-20 bg-primary-600 hover:bg-primary-500 text-white p-1 rounded-full shadow-lg border border-slate-700 transition-transform hover:scale-110">
+              <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
             </button>
           </div>
-          
-          <h2 class="text-3xl font-extrabold mb-1 tracking-tight">{{ authStore.user?.name }}</h2>
-          <p class="text-slate-400 text-sm mb-5 font-medium">{{ authStore.user?.email }}</p>
-          
-          <!-- Role Badge -->
-          <div class="inline-flex items-center gap-1.5 bg-slate-800/80 backdrop-blur-sm border border-slate-600/50 px-4 py-1.5 rounded-full shadow-sm mb-8">
-            <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-            <span class="text-xs font-bold tracking-widest uppercase text-slate-200">Job Seeker</span>
+
+          <!-- Name / Email / Badge -->
+          <div class="min-w-0 flex-1">
+            <h2 class="text-base font-extrabold truncate leading-tight">{{ authStore.user?.name }}</h2>
+            <p class="text-slate-400 text-xs truncate mb-1.5">{{ authStore.user?.email }}</p>
+            <div class="inline-flex items-center gap-1 bg-slate-800/80 border border-slate-600/50 px-2.5 py-0.5 rounded-full">
+              <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+              <span class="text-xs font-bold tracking-widest uppercase text-slate-200">Job Seeker</span>
+            </div>
           </div>
-          
-          <!-- Profile Completion -->
-          <div class="w-full text-left">
-            <div class="flex justify-between items-end mb-2">
-              <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Profile Completion</span>
-              <span class="text-sm font-black text-white bg-slate-800 px-2 py-0.5 rounded-lg border border-slate-700">45%</span>
-            </div>
-            <div class="w-full bg-slate-800/80 rounded-full h-2.5 mb-1 overflow-hidden border border-slate-700/50 shadow-inner">
-              <div class="bg-gradient-to-r from-green-500 to-emerald-400 h-full rounded-full shadow-[0_0_10px_rgba(52,211,153,0.5)] transition-all duration-1000" style="width: 45%"></div>
-            </div>
+        </div>
+
+        <!-- Profile Completion -->
+        <div class="relative z-10 mt-3">
+          <div class="flex justify-between items-center mb-1">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Profile</span>
+            <span class="text-xs font-black text-white bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700">45%</span>
+          </div>
+          <div class="w-full bg-slate-800/80 rounded-full h-1.5 overflow-hidden border border-slate-700/50">
+            <div class="bg-gradient-to-r from-green-500 to-emerald-400 h-full rounded-full shadow-[0_0_8px_rgba(52,211,153,0.5)] transition-all duration-1000" style="width: 45%"></div>
           </div>
         </div>
       </div>
 
-      <!-- Stats Cards (Widgets) -->
-      <div class="lg:col-span-8 grid grid-cols-2 md:grid-cols-4 gap-5 lg:gap-6">
-        
+      <!-- Compact Stat Cards — all 4 in one row -->
+      <div class="flex-1 grid grid-cols-2 md:grid-cols-4 gap-3">
+
         <!-- Widget 1: Resume Strength -->
-        <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-1 group relative overflow-hidden flex flex-col justify-between">
-          <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-green-50 to-transparent rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
-          <div>
-            <div class="w-10 h-10 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center mb-4 group-hover:bg-green-500 group-hover:text-white transition-colors">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-            </div>
-            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Resume Strength</p>
+        <div class="bg-white rounded-2xl px-4 py-3 border border-slate-100 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 group relative overflow-hidden flex items-center gap-3">
+          <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-green-50 to-transparent rounded-bl-full -mr-4 -mt-4"></div>
+          <div class="w-9 h-9 shrink-0 rounded-xl bg-green-50 text-green-600 flex items-center justify-center group-hover:bg-green-500 group-hover:text-white transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
           </div>
-          <div>
-            <h3 class="text-3xl font-black text-slate-900 flex items-baseline gap-1 mt-2">92<span class="text-lg text-slate-400 font-bold">%</span></h3>
-            <p class="text-xs text-green-600 font-bold mt-1 bg-green-50 inline-block px-2 py-1 rounded-lg">Excellent</p>
+          <div class="min-w-0">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-none mb-1">Resume Strength</p>
+            <div class="flex items-baseline gap-1">
+              <span class="text-xl font-black text-slate-900 leading-none">92</span>
+              <span class="text-xs text-slate-400 font-bold">%</span>
+            </div>
+            <span class="text-[10px] text-green-600 font-bold bg-green-50 px-1.5 py-0.5 rounded mt-1 inline-block">Excellent</span>
           </div>
         </div>
-        
+
         <!-- Widget 2: Career Match -->
-        <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-1 group relative overflow-hidden flex flex-col justify-between">
-          <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-primary-50 to-transparent rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
-          <div>
-            <div class="w-10 h-10 rounded-2xl bg-primary-50 text-primary-600 flex items-center justify-center mb-4 group-hover:bg-primary-600 group-hover:text-white transition-colors">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-            </div>
-            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Career Match</p>
+        <div class="bg-white rounded-2xl px-4 py-3 border border-slate-100 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 group relative overflow-hidden flex items-center gap-3">
+          <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-primary-50 to-transparent rounded-bl-full -mr-4 -mt-4"></div>
+          <div class="w-9 h-9 shrink-0 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center group-hover:bg-primary-600 group-hover:text-white transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
           </div>
-          <div>
-            <h3 class="text-3xl font-black text-slate-900 flex items-baseline gap-1 mt-2">88<span class="text-lg text-slate-400 font-bold">%</span></h3>
-            <p class="text-xs text-primary-600 font-bold mt-1 bg-primary-50 inline-block px-2 py-1 rounded-lg">Highly Aligned</p>
+          <div class="min-w-0">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-none mb-1">Career Match</p>
+            <div class="flex items-baseline gap-1">
+              <span class="text-xl font-black text-slate-900 leading-none">88</span>
+              <span class="text-xs text-slate-400 font-bold">%</span>
+            </div>
+            <span class="text-[10px] text-primary-600 font-bold bg-primary-50 px-1.5 py-0.5 rounded mt-1 inline-block">Highly Aligned</span>
           </div>
         </div>
-        
+
         <!-- Widget 3: Interviews -->
-        <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-1 group relative overflow-hidden flex flex-col justify-between">
-          <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-purple-50 to-transparent rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
-          <div>
-            <div class="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-4 group-hover:bg-purple-600 group-hover:text-white transition-colors">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-            </div>
-            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Interviews</p>
+        <div class="bg-white rounded-2xl px-4 py-3 border border-slate-100 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 group relative overflow-hidden flex items-center gap-3">
+          <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-purple-50 to-transparent rounded-bl-full -mr-4 -mt-4"></div>
+          <div class="w-9 h-9 shrink-0 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
           </div>
-          <div>
-            <h3 class="text-3xl font-black text-slate-900 mt-2">0</h3>
-            <p class="text-xs text-slate-500 font-bold mt-1">Upcoming</p>
+          <div class="min-w-0">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-none mb-1">Interviews</p>
+            <span class="text-xl font-black text-slate-900 leading-none">0</span>
+            <p class="text-[10px] text-slate-500 font-bold mt-1">Upcoming</p>
           </div>
         </div>
-        
+
         <!-- Widget 4: Total Applied -->
-        <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-1 group relative overflow-hidden flex flex-col justify-between">
-          <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-50 to-transparent rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
-          <div>
-            <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-            </div>
-            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Total Applied</p>
+        <div class="bg-white rounded-2xl px-4 py-3 border border-slate-100 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 group relative overflow-hidden flex items-center gap-3">
+          <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-blue-50 to-transparent rounded-bl-full -mr-4 -mt-4"></div>
+          <div class="w-9 h-9 shrink-0 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
           </div>
-          <div>
-            <h3 class="text-3xl font-black text-slate-900 mt-2">0</h3>
-            <p class="text-xs text-slate-500 font-bold mt-1">Lifetime</p>
+          <div class="min-w-0">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-none mb-1">Total Applied</p>
+            <span class="text-xl font-black text-slate-900 leading-none">0</span>
+            <p class="text-[10px] text-slate-500 font-bold mt-1">Lifetime</p>
           </div>
         </div>
-        
+
       </div>
     </div>
 
-    <!-- Scrollable Tabs Navigation -->
-    <div class="border-b border-slate-200 overflow-x-auto hide-scrollbar">
-      <div class="flex space-x-1 min-w-max px-1">
-        <button v-for="tab in dashboardTabs" :key="tab.id" 
+    <!-- Row 2: Full Tabs Navigation -->
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm px-3 py-2">
+      <div class="flex flex-wrap gap-1">
+        <button v-for="tab in dashboardTabs" :key="tab.id"
           @click="activeTab = tab.id"
-          :class="['px-5 py-3 font-bold text-sm transition-colors border-b-2 whitespace-nowrap', activeTab === tab.id ? 'border-primary-600 text-primary-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50 rounded-t-lg']"
+          :class="['px-3 py-1.5 font-semibold text-xs rounded-lg transition-all duration-150 whitespace-nowrap',
+            activeTab === tab.id
+              ? 'bg-primary-600 text-white shadow-sm'
+              : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100']"
         >
           {{ tab.label }}
         </button>

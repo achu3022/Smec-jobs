@@ -96,6 +96,10 @@ class ApplicantController extends Controller
         $educations = \App\Models\ApplicantEducation::where('user_id', $request->user()->id)->get();
         $experiences = \App\Models\ApplicantExperience::where('user_id', $request->user()->id)->get();
 
+        if ($profile && $profile->photo) {
+            $profile->photo_url = asset('storage/' . $profile->photo);
+        }
+
         return response()->json([
             'profile' => $profile,
             'educations' => $educations,
@@ -123,6 +127,10 @@ class ApplicantController extends Controller
             ['user_id' => $request->user()->id],
             $data
         );
+
+        if ($profile->photo) {
+            $profile->photo_url = asset('storage/' . $profile->photo);
+        }
 
         return response()->json(['message' => 'Profile updated successfully', 'profile' => $profile]);
     }

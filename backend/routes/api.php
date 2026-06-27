@@ -123,6 +123,23 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 });
 
 // Public endpoints
+Route::post('/contact', function (Illuminate\Http\Request $request) {
+    $request->validate([
+        'name'    => 'required|string|max:100',
+        'email'   => 'required|email|max:150',
+        'subject' => 'required|string|max:150',
+        'message' => 'required|string|max:2000',
+    ]);
+
+    \App\Models\ContactEnquiry::create([
+        'name'    => $request->name,
+        'email'   => $request->email,
+        'subject' => $request->subject,
+        'message' => $request->message,
+    ]);
+
+    return response()->json(['message' => 'Your message has been received. We will get back to you shortly.']);
+});
 Route::get('/jobs/search', [\App\Http\Controllers\JobSearchController::class, 'search']);
 Route::get('/jobs/{uuid}', [App\Http\Controllers\JobController::class, 'show']);
 Route::post('/courses/{id}/enquire', [\App\Http\Controllers\PublicCourseController::class, 'enquire']);
