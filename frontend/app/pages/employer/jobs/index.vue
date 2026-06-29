@@ -110,7 +110,7 @@ useSeoMeta({
 })
 
 const authStore = useAuthStore()
-const { data: jobs, pending, refresh } = await useFetch<any[]>('http://127.0.0.1:8000/api/employer/jobs', {
+const { data: jobs, pending, refresh } = await useFetch<any[]>('/api/employer/jobs', {
   headers: {
     Authorization: authStore.token ? `Bearer ${authStore.token}` : ''
   }
@@ -118,7 +118,7 @@ const { data: jobs, pending, refresh } = await useFetch<any[]>('http://127.0.0.1
 
 const toggleStatus = async (job: any) => {
   try {
-    await $fetch(`http://127.0.0.1:8000/api/employer/jobs/${job.id}/toggle-status`, {
+    await $fetch(`/api/employer/jobs/${job.id}/toggle-status`, {
       method: 'PUT',
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
@@ -130,7 +130,7 @@ const toggleStatus = async (job: any) => {
 
 const toggleUrgent = async (job: any) => {
   try {
-    await $fetch(`http://127.0.0.1:8000/api/employer/jobs/${job.id}/toggle-urgent`, {
+    await $fetch(`/api/employer/jobs/${job.id}/toggle-urgent`, {
       method: 'PUT',
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
@@ -143,7 +143,7 @@ const toggleUrgent = async (job: any) => {
 const duplicateJob = async (job: any) => {
   if (!confirm('Are you sure you want to duplicate this job?')) return
   try {
-    await $fetch(`http://127.0.0.1:8000/api/employer/jobs/${job.id}/duplicate`, {
+    await $fetch(`/api/employer/jobs/${job.id}/duplicate`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${authStore.token}` }
     })

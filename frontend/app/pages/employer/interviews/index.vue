@@ -96,7 +96,7 @@ useSeoMeta({
 
 const authStore = useAuthStore()
 
-const { data: interviews, pending } = await useFetch<any[]>('http://127.0.0.1:8000/api/employer/interviews', {
+const { data: interviews, pending } = await useFetch<any[]>('/api/employer/interviews', {
   headers: { Authorization: `Bearer ${authStore.token}` }
 })
 
@@ -117,7 +117,7 @@ const updateStatus = async (interview: any, event: Event) => {
   interview.status = newStatus // Optimistic UI update
 
   try {
-    await $fetch(`http://127.0.0.1:8000/api/employer/interviews/${interview.id}/status`, {
+    await $fetch(`/api/employer/interviews/${interview.id}/status`, {
       method: 'PUT',
       headers: { Authorization: `Bearer ${authStore.token}` },
       body: { status: newStatus }

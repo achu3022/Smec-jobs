@@ -36,7 +36,7 @@
           <div class="flex items-center gap-5">
              <div class="w-20 h-20 bg-slate-100 border border-slate-200 rounded-full flex items-center justify-center font-bold text-slate-600 text-3xl overflow-hidden shadow-sm shrink-0">
                 <img v-if="application.user?.applicant_profile?.photo" :src="getLogoUrl(application.user.applicant_profile.photo)" class="w-full h-full object-cover"/>
-                <span v-else>{{ application.user?.name ? application.user.name.charAt(0).toUpperCase() : 'U' }}</span>
+                <span v-else v-text="application.user?.name ? application.user.name.charAt(0).toUpperCase() : 'U'"></span>
              </div>
              <div>
                <h1 class="text-3xl font-bold text-slate-900">{{ application.user?.name || 'Candidate Profile' }}</h1>
@@ -183,22 +183,22 @@ onMounted(() => {
 
 const applicationId = route.params.id as string
 
-const { data, pending, error, refresh } = await useFetch<any>(`http://127.0.0.1:8000/api/employer/applications/${applicationId}`, {
+const { data, pending, error, refresh } = await useFetch<any>(`/api/employer/applications/${applicationId}`, {
   headers: { Authorization: `Bearer ${authStore.token}` },
   server: false
 })
 
 const application = computed(() => data.value?.application)
 
-const getLogoUrl = (path: string) => `http://127.0.0.1:8000/storage/${path}`
-const getResumeUrl = (path: string) => `http://127.0.0.1:8000/storage/${path}`
+const getLogoUrl = (path: string) => `/storage/${path}`
+const getResumeUrl = (path: string) => `/storage/${path}`
 
 const isUpdatingStatus = ref(false)
 const updateStatus = async (status: string) => {
   if (!application.value) return
   isUpdatingStatus.value = true
   try {
-    await $fetch(`http://127.0.0.1:8000/api/employer/applications/${application.value.id}/status`, {
+    await $fetch(`/api/employer/applications/${application.value.id}/status`, {
       method: 'PUT',
       headers: { Authorization: `Bearer ${authStore.token}` },
       body: { status }
@@ -212,3 +212,5 @@ const updateStatus = async (status: string) => {
   }
 }
 </script>
+
+<style></style>

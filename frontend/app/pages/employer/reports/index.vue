@@ -125,7 +125,7 @@ useSeoMeta({
 
 const authStore = useAuthStore()
 
-const { data: stats } = await useFetch<any>('http://127.0.0.1:8000/api/employer/dashboard-stats', {
+const { data: stats } = await useFetch<any>('/api/employer/dashboard-stats', {
   headers: { Authorization: `Bearer ${authStore.token}` }
 })
 

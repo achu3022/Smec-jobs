@@ -68,7 +68,7 @@ const jobs = ref<any[]>([])
 const fetchRecommendedJobs = async () => {
   pending.value = true
   try {
-    const data: any = await $fetch('http://127.0.0.1:8000/api/applicant/recommended-jobs', {
+    const data: any = await $fetch('/api/applicant/recommended-jobs', {
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
     jobs.value = data.jobs || []

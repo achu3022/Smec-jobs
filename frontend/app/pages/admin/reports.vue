@@ -127,7 +127,7 @@ const enquiryFilters = reactive({
 const downloadCSV = async (type: string) => {
   try {
     // We use the browser's native fetch API to handle blob downloads
-    const response = await fetch(`http://127.0.0.1:8000/api/admin/export/${type}`, {
+    const response = await fetch(`/api/admin/export/${type}`, {
       headers: {
         Authorization: `Bearer ${authStore.token}`
       }
@@ -164,7 +164,7 @@ const downloadEnquiries = async () => {
     
     const queryString = params.toString() ? `?${params.toString()}` : ''
 
-    const response = await fetch(`http://127.0.0.1:8000/api/admin/export/enquiries${queryString}`, {
+    const response = await fetch(`/api/admin/export/enquiries${queryString}`, {
       headers: {
         Authorization: `Bearer ${authStore.token}`
       }

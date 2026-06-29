@@ -197,7 +197,7 @@ const filters = reactive({
 })
 const page = ref(1)
 
-const { data: jobs, pending, execute } = await useFetch(() => 'http://127.0.0.1:8000/api/jobs/search', {
+const { data: jobs, pending, execute } = await useFetch(() => '/api/jobs/search', {
   params: computed(() => ({
     q: filters.q,
     location: filters.location,
@@ -254,7 +254,7 @@ const applyForJob = async (jobId: number) => {
   applyError.value = false
 
   try {
-    await $fetch(`http://127.0.0.1:8000/api/jobs/${jobId}/apply`, {
+    await $fetch(`/api/jobs/${jobId}/apply`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${authStore.token}`
@@ -279,7 +279,7 @@ const toggleSaveJob = async (job: any) => {
 
   isSavingJob.value = true
   try {
-    const res: any = await $fetch(`http://127.0.0.1:8000/api/applicant/saved-jobs/${job.id}`, {
+    const res: any = await $fetch(`/api/applicant/saved-jobs/${job.id}`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${authStore.token}`

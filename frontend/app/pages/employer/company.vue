@@ -195,12 +195,12 @@ const previewCover = ref('')
 
 const getImageUrl = (path: string | null) => {
   if (!path) return ''
-  return path.startsWith('http') ? path : `http://127.0.0.1:8000/storage/${path}`
+  return path.startsWith('http') ? path : `/storage/${path}`
 }
 
 onMounted(async () => {
   try {
-    const res: any = await $fetch('http://127.0.0.1:8000/api/employer/company', {
+    const res: any = await $fetch('/api/employer/company', {
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
     
@@ -276,7 +276,7 @@ const saveProfile = async () => {
   })
 
   try {
-    const res: any = await $fetch('http://127.0.0.1:8000/api/employer/company', {
+    const res: any = await $fetch('/api/employer/company', {
       method: 'POST', // Using POST for file uploads
       headers: {
         Authorization: `Bearer ${authStore.token}`

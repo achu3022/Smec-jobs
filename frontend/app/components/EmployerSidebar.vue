@@ -61,7 +61,7 @@ import { onMounted, onUnmounted, ref } from 'vue'
 const authStore = useAuthStore()
 const router = useRouter()
 
-const { data: stats, refresh } = await useFetch<any>('http://127.0.0.1:8000/api/employer/dashboard-stats', {
+const { data: stats, refresh } = await useFetch<any>('/api/employer/dashboard-stats', {
   headers: { Authorization: `Bearer ${authStore.token}` },
   server: false,
   immediate: false // don't fetch if unauthenticated

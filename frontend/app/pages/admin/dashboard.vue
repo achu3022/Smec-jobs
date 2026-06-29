@@ -72,8 +72,7 @@
                     <tr v-for="user in recentUsers" :key="user.id" class="hover:bg-slate-50/80 transition-colors">
                       <td class="p-4">
                         <div class="flex items-center gap-3">
-                          <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-xs uppercase">
-                            {{ user.name.charAt(0) }}
+                          <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-xs uppercase" v-text="user.name ? user.name.charAt(0) : 'U'">
                           </div>
                           <div>
                             <p class="font-bold text-sm text-slate-800">{{ user.name }}</p>
@@ -87,8 +86,7 @@
                           {{ user.role }}
                         </span>
                       </td>
-                      <td class="p-4 text-sm text-slate-600">
-                        {{ new Date(user.created_at).toLocaleDateString() }}
+                      <td class="p-4 text-sm text-slate-600" v-text="new Date(user.created_at).toLocaleDateString()">
                       </td>
                     </tr>
                   </tbody>
@@ -212,7 +210,7 @@ const donutChartOptions = computed(() => ({
 const fetchStats = async () => {
   pending.value = true
   try {
-    const res: any = await $fetch('http://127.0.0.1:8000/api/admin/dashboard', {
+    const res: any = await $fetch('/api/admin/dashboard', {
       headers: { Authorization: `Bearer ${useAuthStore().token}` }
     })
     
@@ -230,3 +228,5 @@ onMounted(() => {
   fetchStats()
 })
 </script>
+
+<style></style>

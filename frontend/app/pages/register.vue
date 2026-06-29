@@ -122,7 +122,7 @@ const handleRegister = async () => {
   error.value = ''
   
   try {
-    const response: any = await $fetch('http://127.0.0.1:8000/api/register', {
+    const response: any = await $fetch('/api/register', {
       method: 'POST',
       body: form
     })

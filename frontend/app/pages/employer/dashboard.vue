@@ -237,7 +237,7 @@ const donutChartOptions = computed(() => ({
 const fetchStats = async () => {
   pending.value = true
   try {
-    const res: any = await $fetch('http://127.0.0.1:8000/api/employer/dashboard-stats', {
+    const res: any = await $fetch('/api/employer/dashboard-stats', {
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
     

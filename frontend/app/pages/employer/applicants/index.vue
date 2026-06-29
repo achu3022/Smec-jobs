@@ -119,7 +119,7 @@ const boardColumns = [
   { id: 'hold', title: 'On Hold', colorClass: 'bg-slate-400' }
 ]
 
-const { data: jobs } = await useFetch<any[]>('http://127.0.0.1:8000/api/employer/jobs', {
+const { data: jobs } = await useFetch<any[]>('/api/employer/jobs', {
   headers: { Authorization: `Bearer ${authStore.token}` }
 })
 
@@ -131,7 +131,7 @@ const queryParams = computed(() => {
   return p.toString() ? `?${p.toString()}` : ''
 })
 
-const { data: applicants, refresh, pending } = await useFetch<any[]>(() => `http://127.0.0.1:8000/api/employer/applications${queryParams.value}`, {
+const { data: applicants, refresh, pending } = await useFetch<any[]>(() => `/api/employer/applications${queryParams.value}`, {
   headers: { Authorization: `Bearer ${authStore.token}` },
   server: false
 })
@@ -174,7 +174,7 @@ const moveApplicant = async (app: any, newStatus: string) => {
   }
 
   try {
-    await $fetch(`http://127.0.0.1:8000/api/employer/applications/${app.id}/status`, {
+    await $fetch(`/api/employer/applications/${app.id}/status`, {
       method: 'PUT',
       headers: { Authorization: `Bearer ${authStore.token}` },
       body: { status: newStatus }
@@ -187,7 +187,7 @@ const moveApplicant = async (app: any, newStatus: string) => {
 
 const toggleSaveCandidate = async (userId: number) => {
   try {
-    await $fetch('http://127.0.0.1:8000/api/employer/candidates/saved', {
+    await $fetch('/api/employer/candidates/saved', {
       method: 'POST',
       headers: { Authorization: `Bearer ${authStore.token}` },
       body: { user_id: userId }

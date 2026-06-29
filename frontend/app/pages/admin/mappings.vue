@@ -102,7 +102,7 @@ const form = ref({
 const fetchMappings = async () => {
   pending.value = true
   try {
-    const res: any = await $fetch('http://127.0.0.1:8000/api/admin/mappings', {
+    const res: any = await $fetch('/api/admin/mappings', {
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
     mappings.value = res
@@ -115,7 +115,7 @@ const fetchMappings = async () => {
 
 const fetchOptions = async () => {
   try {
-    const res: any = await $fetch('http://127.0.0.1:8000/api/admin/mappings/options', {
+    const res: any = await $fetch('/api/admin/mappings/options', {
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
     options.value = res
@@ -128,7 +128,7 @@ const createMapping = async () => {
   if (!form.value.job_category_id || !form.value.course_id) return
   isSaving.value = true
   try {
-    await $fetch('http://127.0.0.1:8000/api/admin/mappings', {
+    await $fetch('/api/admin/mappings', {
       method: 'POST',
       headers: { Authorization: `Bearer ${authStore.token}` },
       body: form.value
@@ -145,7 +145,7 @@ const createMapping = async () => {
 const deleteMapping = async (categoryId: number, courseId: number) => {
   if (!confirm('Are you sure you want to remove this mapping?')) return
   try {
-    await $fetch('http://127.0.0.1:8000/api/admin/mappings', {
+    await $fetch('/api/admin/mappings', {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${authStore.token}` },
       body: {

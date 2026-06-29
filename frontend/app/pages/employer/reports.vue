@@ -161,7 +161,7 @@ const barChartOptions = computed(() => ({
 const fetchReports = async () => {
   pending.value = true
   try {
-    const res: any = await $fetch('http://127.0.0.1:8000/api/employer/reports', {
+    const res: any = await $fetch('/api/employer/reports', {
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
     

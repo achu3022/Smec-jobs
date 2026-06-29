@@ -49,7 +49,7 @@
 import { useAuthStore } from '~/stores/auth'
 const authStore = useAuthStore()
 
-const { data: applications, pending } = await useFetch<any[]>('http://127.0.0.1:8000/api/applicant/applications', {
+const { data: applications, pending } = await useFetch<any[]>('/api/applicant/applications', {
   headers: { Authorization: `Bearer ${authStore.token}` }
 })
 </script>

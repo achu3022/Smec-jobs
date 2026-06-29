@@ -17,4 +17,7 @@ export default defineNuxtConfig({
     ],
   },
   css: ['~/assets/css/main.css'],
+  routeRules: {
+    '/api/**': { proxy: 'http://127.0.0.1:8000/api/**' }
+  }
 })

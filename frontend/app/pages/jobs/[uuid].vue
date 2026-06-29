@@ -247,7 +247,7 @@ const authStore = useAuthStore()
 
 const uuid = route.params.uuid as string
 
-const { data, pending } = await useFetch<any>(`http://127.0.0.1:8000/api/jobs/${uuid}`, {
+const { data, pending } = await useFetch<any>(`/api/jobs/${uuid}`, {
   headers: {
     Authorization: authStore.token ? `Bearer ${authStore.token}` : ''
   }
@@ -279,7 +279,7 @@ const applyForJob = async () => {
   applyMessage.value = ''
   applyError.value = false
   try {
-    await $fetch(`http://127.0.0.1:8000/api/jobs/${data.value.job.id}/apply`, {
+    await $fetch(`/api/jobs/${data.value.job.id}/apply`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
@@ -301,7 +301,7 @@ const toggleSaveJob = async () => {
   }
   isSavingJob.value = true
   try {
-    const res: any = await $fetch(`http://127.0.0.1:8000/api/applicant/saved-jobs/${data.value.job.id}`, {
+    const res: any = await $fetch(`/api/applicant/saved-jobs/${data.value.job.id}`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
@@ -332,7 +332,7 @@ const openEnquiry = async (course: any) => {
   if (authStore.isAuthenticated) {
     isSubmittingEnquiry.value = course.id
     try {
-      await $fetch(`http://127.0.0.1:8000/api/courses/${course.id}/enquire`, {
+      await $fetch(`/api/courses/${course.id}/enquire`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${authStore.token}` }
       })
@@ -366,7 +366,7 @@ const submitEnquiry = async () => {
   isSubmittingEnquiry.value = selectedCourse.value.id
   enquiryError.value = ''
   try {
-    await $fetch(`http://127.0.0.1:8000/api/courses/${selectedCourse.value.id}/enquire`, {
+    await $fetch(`/api/courses/${selectedCourse.value.id}/enquire`, {
       method: 'POST',
       body: {
         name: enquiryForm.name,

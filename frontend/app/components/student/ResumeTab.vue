@@ -96,7 +96,7 @@ const showPdfModal = ref(false)
 
 const fetchResume = async () => {
   try {
-    const data: any = await $fetch('http://127.0.0.1:8000/api/applicant/resume', {
+    const data: any = await $fetch('/api/applicant/resume', {
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
     currentResume.value = data.resume
@@ -133,7 +133,7 @@ const handleUpload = async () => {
     const formData = new FormData()
     formData.append('resume', selectedFile.value)
 
-    await $fetch('http://127.0.0.1:8000/api/applicant/resume', {
+    await $fetch('/api/applicant/resume', {
       method: 'POST',
       headers: { Authorization: `Bearer ${authStore.token}` },
       body: formData

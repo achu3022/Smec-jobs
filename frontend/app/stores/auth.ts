@@ -38,7 +38,7 @@ export const useAuthStore = defineStore('auth', () => {
   const logout = async () => {
     if (token.value) {
       try {
-        await $fetch('http://127.0.0.1:8000/api/logout', {
+        await $fetch('/api/logout', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token.value}`

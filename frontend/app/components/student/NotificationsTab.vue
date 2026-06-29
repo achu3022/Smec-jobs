@@ -46,10 +46,10 @@
           </div>
           <p class="text-slate-600 text-sm leading-relaxed mb-3">{{ notif.message }}</p>
           
-          <NuxtLink v-if="notif.link" :to="notif.link" class="inline-flex items-center gap-1.5 text-sm font-bold text-indigo-600 hover:text-indigo-800">
+          <button v-if="notif.link" @click="handleNotificationClick(notif)" class="inline-flex items-center gap-1.5 text-sm font-bold text-indigo-600 hover:text-indigo-800">
             View Details
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-          </NuxtLink>
+          </button>
         </div>
         
         <div v-if="!notif.is_read" class="shrink-0 flex items-center">
@@ -71,6 +71,7 @@ import { ref, computed, watch } from 'vue'
 import { useAuthStore } from '~/stores/auth'
 
 const authStore = useAuthStore()
+const router = useRouter()
 const marking = ref(false)
 
 const currentPage = ref(1)
@@ -78,7 +79,7 @@ const lastPage = ref(1)
 const isLoadingMore = ref(false)
 const localNotifications = ref<any[]>([])
 
-const { data: initialData, pending, refresh } = await useFetch<any>('http://127.0.0.1:8000/api/applicant/notifications', {
+const { data: initialData, pending, refresh } = await useFetch<any>('/api/applicant/notifications', {
   headers: { Authorization: `Bearer ${authStore.token}` },
   server: false
 })
@@ -95,7 +96,7 @@ watch(initialData, (newVal) => {
 const fetchNotifications = async (page = 1) => {
   isLoadingMore.value = true
   try {
-    const res: any = await $fetch(`http://127.0.0.1:8000/api/applicant/notifications?page=${page}`, {
+    const res: any = await $fetch(`/api/applicant/notifications?page=${page}`, {
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
     
@@ -114,18 +115,38 @@ const unreadCount = computed(() => {
 })
 
 const markAllAsRead = async () => {
-  if (marking.value) return
   marking.value = true
   try {
-    await $fetch('http://127.0.0.1:8000/api/applicant/notifications/read-all', {
+    await $fetch('/api/applicant/notifications/read-all', {
       method: 'POST',
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
     localNotifications.value.forEach(n => n.is_read = true)
-  } catch (err) {
-    console.error(err)
+    
+    // Refresh to trigger backend logic if it needs to switch to "10 recent" view
+    await fetchNotifications(1)
+  } catch (e) {
+    console.error('Failed to mark all as read', e)
   } finally {
     marking.value = false
+  }
+}
+
+const handleNotificationClick = async (notif: any) => {
+  if (!notif.is_read) {
+    notif.is_read = true
+    try {
+      await $fetch(`/api/applicant/notifications/${notif.id}/read`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${authStore.token}` }
+      })
+    } catch (e) {
+      console.error('Failed to mark as read', e)
+    }
+  }
+  
+  if (notif.link) {
+    router.push(notif.link)
   }
 }
 </script>

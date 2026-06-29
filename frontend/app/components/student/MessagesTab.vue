@@ -133,7 +133,7 @@ const activeChat = ref<any>(null)
 const newMessage = ref('')
 const sending = ref(false)
 
-const { data: messages, pending, refresh } = await useFetch<any[]>('http://127.0.0.1:8000/api/applicant/messages', {
+const { data: messages, pending, refresh } = await useFetch<any[]>('/api/applicant/messages', {
   headers: { Authorization: `Bearer ${authStore.token}` }
 })
 
@@ -175,7 +175,7 @@ const selectChat = async (userId: string | number) => {
   // Mark as read
   if (groupedMessages.value[userId]?.unreadCount > 0) {
     try {
-      await $fetch(`http://127.0.0.1:8000/api/applicant/messages/${userId}/read`, {
+      await $fetch(`/api/applicant/messages/${userId}/read`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${authStore.token}` }
       })
@@ -200,7 +200,7 @@ const sendReply = async () => {
   const chat = groupedMessages.value[activeChat.value]
   
   try {
-    await $fetch('http://127.0.0.1:8000/api/applicant/messages', {
+    await $fetch('/api/applicant/messages', {
       method: 'POST',
       headers: { Authorization: `Bearer ${authStore.token}` },
       body: {

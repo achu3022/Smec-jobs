@@ -64,9 +64,8 @@
               <tr v-else v-for="user in users.data" :key="user.id" class="hover:bg-slate-50 transition-colors">
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
-                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold">
-                      {{ user.name.charAt(0) }}
-                    </div>
+                        <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-xs uppercase" v-text="user.name ? user.name.charAt(0) : 'U'">
+                        </div>
                     <div class="ml-4">
                       <div class="text-sm font-medium text-slate-900">{{ user.name }}</div>
                     </div>
@@ -79,7 +78,8 @@
                     {{ user.role }}
                   </span>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ new Date(user.created_at).toLocaleDateString() }}</td>
+                    <td class="p-4 text-sm text-slate-600" v-text="new Date(user.created_at).toLocaleDateString()">
+                    </td>
               </tr>
             </tbody>
           </table>
@@ -94,17 +94,19 @@ import { useAuthStore } from '~/stores/auth'
 
 const authStore = useAuthStore()
 
-const { data: stats, pending, error } = await useFetch('http://127.0.0.1:8000/api/admin/stats', {
+const { data: stats, pending, error } = await useFetch('/api/admin/stats', {
   headers: {
     Authorization: `Bearer ${authStore.token}`
   },
   server: false
 })
 
-const { data: users, pending: usersPending } = await useFetch('http://127.0.0.1:8000/api/admin/users', {
+const { data: users, pending: usersPending } = await useFetch('/api/admin/users', {
   headers: {
     Authorization: `Bearer ${authStore.token}`
   },
   server: false
 })
 </script>
+
+<style></style>

@@ -90,7 +90,7 @@
                 <div class="flex items-center gap-4">
                   <div class="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center font-bold text-slate-600 overflow-hidden">
                     <img v-if="app.user?.applicantProfile?.photo" :src="getLogoUrl(app.user.applicantProfile.photo)" class="w-full h-full object-cover"/>
-                    <span v-else>{{ app.user?.name ? app.user.name.charAt(0).toUpperCase() : 'U' }}</span>
+                    <span v-else v-text="app.user?.name ? app.user.name.charAt(0).toUpperCase() : 'U'"></span>
                   </div>
                   <div>
                     <h4 class="font-bold text-slate-900">{{ app.user?.name }}</h4>
@@ -267,12 +267,12 @@ const authStore = useAuthStore()
 const activeTab = ref('jobs')
 
 // Jobs Fetching
-const { data: jobs, pending: pendingJobs, refresh: refreshJobs } = await useFetch<any[]>('http://127.0.0.1:8000/api/employer/jobs', {
+const { data: jobs, pending: pendingJobs, refresh: refreshJobs } = await useFetch<any[]>('/api/employer/jobs', {
   headers: { Authorization: `Bearer ${authStore.token}` },
   server: false
 })
 
-const { data: categories } = await useFetch<any[]>('http://127.0.0.1:8000/api/categories', { server: false })
+const { data: categories } = await useFetch<any[]>('/api/categories', { server: false })
 
 // Stats
 const activeJobsCount = computed(() => jobs.value?.filter(j => j.is_active).length || 0)
@@ -302,7 +302,7 @@ const companyLogoPreview = ref<string | null>(null)
 
 const fetchCompanyProfile = async () => {
   try {
-    const res: any = await $fetch('http://127.0.0.1:8000/api/employer/company', {
+    const res: any = await $fetch('/api/employer/company', {
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
     if (res.company) {
@@ -320,8 +320,8 @@ const fetchCompanyProfile = async () => {
 
 onMounted(() => { fetchCompanyProfile() })
 
-const getLogoUrl = (path: string) => `http://127.0.0.1:8000/storage/${path}`
-const getResumeUrl = (path: string) => `http://127.0.0.1:8000/storage/${path}`
+const getLogoUrl = (path: string) => `/storage/${path}`
+const getResumeUrl = (path: string) => `/storage/${path}`
 
 const onLogoChange = (e: Event) => {
   const target = e.target as HTMLInputElement
@@ -348,7 +348,7 @@ const saveCompany = async () => {
     formData.append('logo_path', companyForm.logo || '')
   }
   try {
-    const res: any = await $fetch('http://127.0.0.1:8000/api/employer/company', {
+    const res: any = await $fetch('/api/employer/company', {
       method: 'PUT',
       headers: { Authorization: `Bearer ${authStore.token}` },
       body: formData
@@ -397,13 +397,13 @@ const postJob = async () => {
   jobError.value = ''
   try {
     if (editingJobId.value) {
-      await $fetch(`http://127.0.0.1:8000/api/employer/jobs/${editingJobId.value}`, {
+      await $fetch(`/api/employer/jobs/${editingJobId.value}`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${authStore.token}` },
         body: jobForm
       })
     } else {
-      await $fetch('http://127.0.0.1:8000/api/employer/jobs', {
+      await $fetch('/api/employer/jobs', {
         method: 'POST',
         headers: { Authorization: `Bearer ${authStore.token}` },
         body: jobForm
@@ -421,7 +421,7 @@ const postJob = async () => {
 
 const toggleJobStatus = async (job: any) => {
   try {
-    await $fetch(`http://127.0.0.1:8000/api/employer/jobs/${job.id}/toggle-status`, {
+    await $fetch(`/api/employer/jobs/${job.id}/toggle-status`, {
       method: 'PUT',
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
@@ -436,7 +436,7 @@ const isUpdatingStatus = ref(false)
 const updateStatus = async (application: any, status: string) => {
   isUpdatingStatus.value = true
   try {
-    await $fetch(`http://127.0.0.1:8000/api/employer/applications/${application.id}/status`, {
+    await $fetch(`/api/employer/applications/${application.id}/status`, {
       method: 'PUT',
       headers: { Authorization: `Bearer ${authStore.token}` },
       body: { status }
@@ -451,3 +451,5 @@ const updateStatus = async (application: any, status: string) => {
 }
 
 </script>
+
+<style></style>

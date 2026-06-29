@@ -87,7 +87,7 @@ import { useAuthStore } from '~/stores/auth'
 
 const authStore = useAuthStore()
 
-const { data, pending } = await useFetch<any>('http://127.0.0.1:8000/api/applicant/interviews', {
+const { data, pending } = await useFetch<any>('/api/applicant/interviews', {
   headers: { Authorization: `Bearer ${authStore.token}` }
 })
 

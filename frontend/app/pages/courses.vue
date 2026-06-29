@@ -132,7 +132,7 @@ useHead({
 })
 
 const authStore = useAuthStore()
-const { data: courses, pending } = await useFetch('http://127.0.0.1:8000/api/courses')
+const { data: courses, pending } = await useFetch('/api/courses')
 
 const searchQuery = ref('')
 const isModalOpen = ref(false)
@@ -168,7 +168,7 @@ const handleEnquire = async (course: any) => {
     // Auto submit using bearer token
     isSubmitting.value = course.id
     try {
-      await $fetch(`http://127.0.0.1:8000/api/courses/${course.id}/enquire`, {
+      await $fetch(`/api/courses/${course.id}/enquire`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${authStore.token}` }
       })
@@ -195,7 +195,7 @@ const submitGuestEnquiry = async () => {
   if (!selectedCourse.value) return
   isSubmitting.value = selectedCourse.value.id
   try {
-    await $fetch(`http://127.0.0.1:8000/api/courses/${selectedCourse.value.id}/enquire`, {
+    await $fetch(`/api/courses/${selectedCourse.value.id}/enquire`, {
       method: 'POST',
       body: form.value
     })

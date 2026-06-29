@@ -127,7 +127,7 @@ const form = ref({
 const fetchSettings = async () => {
   pending.value = true
   try {
-    const res: any = await $fetch('http://127.0.0.1:8000/api/admin/settings', {
+    const res: any = await $fetch('/api/admin/settings', {
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
     
@@ -153,7 +153,7 @@ const saveSettings = async () => {
   errorMessage.value = ''
   
   try {
-    await $fetch('http://127.0.0.1:8000/api/admin/settings', {
+    await $fetch('/api/admin/settings', {
       method: 'POST',
       headers: { Authorization: `Bearer ${authStore.token}` },
       body: form.value

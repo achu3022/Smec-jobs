@@ -31,7 +31,7 @@
         <template #cell-name="{ item }">
           <div class="flex items-center gap-3">
             <div class="w-16 h-10 bg-transparent flex items-center justify-center shrink-0">
-              <img v-if="item.logo" :src="item.logo.startsWith('http') ? item.logo : `http://127.0.0.1:8000/storage/${item.logo}`" class="max-w-full max-h-full object-contain" />
+              <img v-if="item.logo" :src="item.logo.startsWith('http') ? item.logo : `/storage/${item.logo}`" class="max-w-full max-h-full object-contain" />
               <span v-else class="text-xl font-bold text-slate-400">{{ item.name.charAt(0).toUpperCase() }}</span>
             </div>
             <div>
@@ -163,7 +163,7 @@ const form = ref({
 const fetchCompanies = async () => {
   pending.value = true
   try {
-    const res: any = await $fetch('http://127.0.0.1:8000/api/admin/companies', {
+    const res: any = await $fetch('/api/admin/companies', {
       headers: { Authorization: `Bearer ${authStore.token}` },
       query: { search: searchQuery.value, page: page.value }
     })
@@ -196,7 +196,7 @@ const closeModal = () => {
 const saveCompany = async () => {
   isSaving.value = true
   try {
-    await $fetch(`http://127.0.0.1:8000/api/admin/companies/${form.value.id}`, {
+    await $fetch(`/api/admin/companies/${form.value.id}`, {
       method: 'PUT',
       headers: { Authorization: `Bearer ${authStore.token}` },
       body: form.value
@@ -214,7 +214,7 @@ const toggleStatus = async (company: any) => {
   const action = company.deleted_at ? 'restore' : 'suspend'
   if (!confirm(`Are you sure you want to ${action} this company?`)) return
   try {
-    await $fetch(`http://127.0.0.1:8000/api/admin/companies/${company.id}/toggle-status`, {
+    await $fetch(`/api/admin/companies/${company.id}/toggle-status`, {
       method: 'PUT',
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
@@ -227,7 +227,7 @@ const toggleStatus = async (company: any) => {
 const deleteCompany = async (id: number) => {
   if (!confirm('Are you sure you want to permanently delete this company? This action cannot be undone.')) return
   try {
-    await $fetch(`http://127.0.0.1:8000/api/admin/companies/${id}`, {
+    await $fetch(`/api/admin/companies/${id}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
@@ -239,7 +239,7 @@ const deleteCompany = async (id: number) => {
 
 const downloadCSV = async (type: string) => {
   try {
-    const response = await fetch(`http://127.0.0.1:8000/api/admin/export/${type}`, {
+    const response = await fetch(`/api/admin/export/${type}`, {
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
     if (!response.ok) throw new Error('Export failed')

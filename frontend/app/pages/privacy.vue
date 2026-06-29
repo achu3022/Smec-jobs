@@ -40,10 +40,19 @@ useHead({ title: 'Privacy Policy — SMECJobs' })
 
 const sections = [
   {
-    content: [
-      'We may update this Privacy Policy from time to time. When we do, we will update the "Last updated" date at the top of this page.',
-      'Continued use of SMECJobs after changes are posted constitutes your acceptance of the updated policy.',
-    ]
+    title: 'Information Collection',
+    icon: 'lucide:database',
+    content: 'We collect personal information such as your name, email, and resume when you create an account. This information is used strictly to provide you with job matching services.'
   },
+  {
+    title: 'Data Sharing',
+    icon: 'lucide:share-2',
+    content: 'Your profile information is shared with employers when you apply for a job or if you opt-in to make your profile public. We do not sell your personal data to third parties.'
+  },
+  {
+    title: 'Policy Updates',
+    icon: 'lucide:refresh-cw',
+    content: 'We may update this Privacy Policy from time to time. Continued use of SMECJobs after changes are posted constitutes your acceptance of the updated policy.'
+  }
 ]
 </script>

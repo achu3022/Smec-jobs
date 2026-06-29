@@ -118,7 +118,7 @@ let searchTimeout: any = null
 const fetchEnquiries = async () => {
   pending.value = true
   try {
-    const res: any = await $fetch('http://127.0.0.1:8000/api/admin/enquiries', {
+    const res: any = await $fetch('/api/admin/enquiries', {
       headers: { Authorization: `Bearer ${authStore.token}` },
       query: { search: searchQuery.value, status: activeStatus.value, page: page.value }
     })
@@ -142,7 +142,7 @@ const handleSearch = (val: string) => {
 const updateStatus = async (enquiry: any, event: any) => {
   const newStatus = event.target.value
   try {
-    await $fetch(`http://127.0.0.1:8000/api/admin/enquiries/${enquiry.id}/status`, {
+    await $fetch(`/api/admin/enquiries/${enquiry.id}/status`, {
       method: 'PUT',
       headers: { Authorization: `Bearer ${authStore.token}` },
       body: { status: newStatus }
@@ -158,7 +158,7 @@ const updateStatus = async (enquiry: any, event: any) => {
 const deleteEnquiry = async (id: number) => {
   if (!confirm('Are you sure you want to permanently delete this enquiry?')) return
   try {
-    await $fetch(`http://127.0.0.1:8000/api/admin/enquiries/${id}`, {
+    await $fetch(`/api/admin/enquiries/${id}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${authStore.token}` }
     })

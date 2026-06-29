@@ -229,7 +229,7 @@ const scheduleInterview = async () => {
   interviewError.value = ''
   
   try {
-    await $fetch(`http://127.0.0.1:8000/api/employer/applications/${props.applicant.id}/interviews`, {
+    await $fetch(`/api/employer/applications/${props.applicant.id}/interviews`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${authStore.token}` },
       body: {
@@ -240,7 +240,7 @@ const scheduleInterview = async () => {
     })
     
     // Automatically change status to targeted interview step
-    await $fetch(`http://127.0.0.1:8000/api/employer/applications/${props.applicant.id}/status`, {
+    await $fetch(`/api/employer/applications/${props.applicant.id}/status`, {
       method: 'PUT',
       headers: { Authorization: `Bearer ${authStore.token}` },
       body: { status: props.targetInterviewStatus }
@@ -263,7 +263,7 @@ const sendMessage = async () => {
   messageError.value = ''
   
   try {
-    await $fetch('http://127.0.0.1:8000/api/employer/messages', {
+    await $fetch('/api/employer/messages', {
       method: 'POST',
       headers: { Authorization: `Bearer ${authStore.token}` },
       body: {

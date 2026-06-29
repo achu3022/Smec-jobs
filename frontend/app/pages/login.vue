@@ -96,7 +96,7 @@ if (route.query.verified === '1') {
 
 const resendVerification = async () => {
   try {
-    const res: any = await $fetch('http://127.0.0.1:8000/api/email/resend', {
+    const res: any = await $fetch('/api/email/resend', {
       method: 'POST',
       body: { email: form.email }
     })
@@ -113,7 +113,7 @@ const handleLogin = async () => {
   error.value = ''
   
   try {
-    const response: any = await $fetch('http://127.0.0.1:8000/api/login', {
+    const response: any = await $fetch('/api/login', {
       method: 'POST',
       body: form
     })

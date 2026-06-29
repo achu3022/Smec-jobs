@@ -142,14 +142,14 @@ const form = reactive({
   education_level: ''
 })
 
-const { data: categories } = await useFetch<any[]>('http://127.0.0.1:8000/api/categories')
+const { data: categories } = await useFetch<any[]>('/api/categories')
 
 const submitJob = async () => {
   loading.value = true
   error.value = ''
   
   try {
-    await $fetch('http://127.0.0.1:8000/api/employer/jobs', {
+    await $fetch('/api/employer/jobs', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${authStore.token}`

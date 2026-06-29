@@ -124,7 +124,7 @@ let searchTimeout: any = null
 const fetchUsers = async () => {
   pending.value = true
   try {
-    const res: any = await $fetch('http://127.0.0.1:8000/api/admin/users', {
+    const res: any = await $fetch('/api/admin/users', {
       headers: { Authorization: `Bearer ${authStore.token}` },
       query: {
         role: activeRole.value,
@@ -152,7 +152,7 @@ const handleSearch = (val: string) => {
 const toggleStatus = async (user: any) => {
   if (!confirm(`Are you sure you want to ${user.deleted_at ? 'activate' : 'suspend'} this user?`)) return
   try {
-    await $fetch(`http://127.0.0.1:8000/api/admin/users/${user.id}/toggle-status`, {
+    await $fetch(`/api/admin/users/${user.id}/toggle-status`, {
       method: 'PUT',
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
@@ -165,7 +165,7 @@ const toggleStatus = async (user: any) => {
 const deleteUser = async (user: any) => {
   if (!confirm('Are you sure you want to permanently delete this user? This cannot be undone.')) return
   try {
-    await $fetch(`http://127.0.0.1:8000/api/admin/users/${user.id}`, {
+    await $fetch(`/api/admin/users/${user.id}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
@@ -177,7 +177,7 @@ const deleteUser = async (user: any) => {
 
 const downloadCSV = async (type: string) => {
   try {
-    const response = await fetch(`http://127.0.0.1:8000/api/admin/export/${type}`, {
+    const response = await fetch(`/api/admin/export/${type}`, {
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
     if (!response.ok) throw new Error('Export failed')

@@ -97,7 +97,7 @@ const submitForm = async () => {
   loading.value = true
   error.value = ''
   try {
-    await $fetch('http://127.0.0.1:8000/api/contact', {
+    await $fetch('/api/contact', {
       method: 'POST',
       body: form.value
     })

@@ -192,7 +192,7 @@ const form = ref({
 const fetchJobs = async () => {
   pending.value = true
   try {
-    const res: any = await $fetch('http://127.0.0.1:8000/api/admin/jobs', {
+    const res: any = await $fetch('/api/admin/jobs', {
       headers: { Authorization: `Bearer ${authStore.token}` },
       query: { search: searchQuery.value, status: activeStatus.value, page: page.value }
     })
@@ -206,7 +206,7 @@ const fetchJobs = async () => {
 
 const fetchOptions = async () => {
   try {
-    const res: any = await $fetch('http://127.0.0.1:8000/api/admin/jobs/options', {
+    const res: any = await $fetch('/api/admin/jobs/options', {
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
     options.value = res
@@ -236,7 +236,7 @@ const closeModal = () => {
 const saveJob = async () => {
   isSaving.value = true
   try {
-    await $fetch(`http://127.0.0.1:8000/api/admin/jobs/${form.value.id}`, {
+    await $fetch(`/api/admin/jobs/${form.value.id}`, {
       method: 'PUT',
       headers: { Authorization: `Bearer ${authStore.token}` },
       body: form.value
@@ -254,7 +254,7 @@ const toggleStatus = async (job: any) => {
   const action = job.is_active ? 'close' : 'activate'
   if (!confirm(`Are you sure you want to ${action} this job?`)) return
   try {
-    await $fetch(`http://127.0.0.1:8000/api/admin/jobs/${job.id}/toggle-status`, {
+    await $fetch(`/api/admin/jobs/${job.id}/toggle-status`, {
       method: 'PUT',
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
@@ -266,7 +266,7 @@ const toggleStatus = async (job: any) => {
 
 const toggleFeatured = async (id: number) => {
   try {
-    await $fetch(`http://127.0.0.1:8000/api/admin/jobs/${id}/toggle-featured`, {
+    await $fetch(`/api/admin/jobs/${id}/toggle-featured`, {
       method: 'PUT',
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
@@ -279,7 +279,7 @@ const toggleFeatured = async (id: number) => {
 const deleteJob = async (id: number) => {
   if (!confirm('Are you sure you want to permanently delete this job? This action cannot be undone.')) return
   try {
-    await $fetch(`http://127.0.0.1:8000/api/admin/jobs/${id}`, {
+    await $fetch(`/api/admin/jobs/${id}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
@@ -291,7 +291,7 @@ const deleteJob = async (id: number) => {
 
 const downloadCSV = async (type: string) => {
   try {
-    const response = await fetch(`http://127.0.0.1:8000/api/admin/export/${type}`, {
+    const response = await fetch(`/api/admin/export/${type}`, {
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
     if (!response.ok) throw new Error('Export failed')

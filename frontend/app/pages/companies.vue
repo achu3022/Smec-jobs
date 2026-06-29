@@ -33,7 +33,7 @@
         <div v-for="company in filteredCompanies" :key="company.id" class="bg-white rounded-3xl border border-slate-100 p-8 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
           <div class="flex items-start gap-5 mb-6">
             <div class="w-24 h-16 bg-transparent flex items-center justify-start shrink-0">
-              <img v-if="company.logo" :src="company.logo.startsWith('http') ? company.logo : `http://127.0.0.1:8000/storage/${company.logo}`" :alt="company.name" class="max-w-full max-h-full object-contain">
+              <img v-if="company.logo" :src="company.logo.startsWith('http') ? company.logo : `/storage/${company.logo}`" :alt="company.name" class="max-w-full max-h-full object-contain">
               <span v-else class="text-2xl font-bold text-slate-400">{{ company.name.charAt(0) }}</span>
             </div>
             <div>
@@ -73,7 +73,7 @@ useHead({
   title: 'Browse Companies - SMECJobs'
 })
 
-const { data: companies, pending } = await useFetch('http://127.0.0.1:8000/api/companies')
+const { data: companies, pending } = await useFetch('/api/companies')
 
 const searchQuery = ref('')
 

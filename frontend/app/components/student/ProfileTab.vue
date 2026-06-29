@@ -407,7 +407,7 @@ const experiences = ref<any[]>([])
 // Fetch user profile data
 onMounted(async () => {
   try {
-    const data: any = await $fetch('http://127.0.0.1:8000/api/applicant/profile', {
+    const data: any = await $fetch('/api/applicant/profile', {
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
     if (data.profile) {
@@ -453,7 +453,7 @@ const saveProfile = async () => {
       formData.append(key, val === true ? '1' : (val === false ? '0' : val))
     }
 
-    const response = await $fetch<any>('http://127.0.0.1:8000/api/applicant/profile', {
+    const response = await $fetch<any>('/api/applicant/profile', {
       method: 'POST',
       headers: { Authorization: `Bearer ${authStore.token}` },
       body: formData
@@ -477,7 +477,7 @@ const saveProfile = async () => {
 const saveEducation = async () => {
   isSavingEdu.value = true
   try {
-    const newEdu = await $fetch<any>('http://127.0.0.1:8000/api/applicant/education', {
+    const newEdu = await $fetch<any>('/api/applicant/education', {
       method: 'POST',
       headers: { Authorization: `Bearer ${authStore.token}` },
       body: eduForm.value
@@ -495,7 +495,7 @@ const saveEducation = async () => {
 const deleteEducation = async (id: number) => {
   if (!confirm('Are you sure you want to delete this education entry?')) return
   try {
-    await $fetch(`http://127.0.0.1:8000/api/applicant/education/${id}`, {
+    await $fetch(`/api/applicant/education/${id}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
@@ -508,7 +508,7 @@ const deleteEducation = async (id: number) => {
 const saveExperience = async () => {
   isSavingExp.value = true
   try {
-    const newExp = await $fetch<any>('http://127.0.0.1:8000/api/applicant/experience', {
+    const newExp = await $fetch<any>('/api/applicant/experience', {
       method: 'POST',
       headers: { Authorization: `Bearer ${authStore.token}` },
       body: expForm.value
@@ -526,7 +526,7 @@ const saveExperience = async () => {
 const deleteExperience = async (id: number) => {
   if (!confirm('Are you sure you want to delete this experience entry?')) return
   try {
-    await $fetch(`http://127.0.0.1:8000/api/applicant/experience/${id}`, {
+    await $fetch(`/api/applicant/experience/${id}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${authStore.token}` }
     })

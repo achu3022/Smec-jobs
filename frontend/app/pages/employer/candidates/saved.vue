@@ -26,7 +26,7 @@
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div v-for="candidate in candidates" :key="candidate.id" class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col transition-all hover:border-indigo-300 hover:shadow-md relative group">
           
-          <button @click="removeCandidate(candidate.user?.id)" class="absolute top-4 right-4 text-rose-500 hover:text-rose-600 opacity-0 group-hover:opacity-100 transition-opacity" title="Remove from pool">
+          <button @click="removeCandidate(candidate.user_id)" class="absolute top-4 right-4 text-rose-500 hover:text-rose-600 opacity-0 group-hover:opacity-100 transition-opacity" title="Remove from pool">
             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path></svg>
           </button>
 
@@ -82,7 +82,7 @@ useSeoMeta({
 
 const authStore = useAuthStore()
 
-const { data: candidates, pending, refresh } = await useFetch<any[]>('http://127.0.0.1:8000/api/employer/candidates/saved', {
+const { data: candidates, pending, refresh } = await useFetch<any[]>('/api/employer/candidates/saved', {
   headers: { Authorization: `Bearer ${authStore.token}` }
 })
 
@@ -99,7 +99,7 @@ const openApplicantModal = (candidate: any) => {
 const removeCandidate = async (userId: number) => {
   if (!confirm('Remove this candidate from your Talent Pool?')) return
   try {
-    await $fetch('http://127.0.0.1:8000/api/employer/candidates/saved', {
+    await $fetch('/api/employer/candidates/saved', {
       method: 'POST',
       headers: { Authorization: `Bearer ${authStore.token}` },
       body: { user_id: userId }

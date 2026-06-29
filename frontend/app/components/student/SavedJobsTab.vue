@@ -48,14 +48,14 @@
 import { useAuthStore } from '~/stores/auth'
 const authStore = useAuthStore()
 
-const { data: savedJobs, pending: pendingSaved, refresh: refreshSaved } = await useFetch<any[]>('http://127.0.0.1:8000/api/applicant/saved-jobs', {
+const { data: savedJobs, pending: pendingSaved, refresh: refreshSaved } = await useFetch<any[]>('/api/applicant/saved-jobs', {
   headers: { Authorization: `Bearer ${authStore.token}` },
   transform: (res: any) => res.saved_jobs || []
 })
 
 const unsaveJob = async (jobId: number) => {
   try {
-    await $fetch(`http://127.0.0.1:8000/api/jobs/${jobId}/save`, {
+    await $fetch(`/api/jobs/${jobId}/save`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${authStore.token}` }
     })

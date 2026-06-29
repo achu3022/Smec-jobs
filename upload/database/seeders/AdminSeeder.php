@@ -1,0 +1,25 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use App\Models\User;
+
+class AdminSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        $admin = User::updateOrCreate(
+            ['email' => 'admin@smecjobs.com'],
+            [
+                'name' => 'Super Admin',
+                'password' => bcrypt('Admin@123'),
+                'role' => 'admin',
+            ]
+        );
+        $this->command->info('Admin user verified: admin@smecjobs.com / Admin@123');
+    }
+}

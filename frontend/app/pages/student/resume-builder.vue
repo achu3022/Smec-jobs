@@ -133,7 +133,7 @@ onMounted(async () => {
   }
   
   try {
-    const data: any = await $fetch('http://127.0.0.1:8000/api/applicant/profile', {
+    const data: any = await $fetch('/api/applicant/profile', {
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
     

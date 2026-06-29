@@ -114,7 +114,7 @@
     <div class="bg-white rounded-2xl border border-slate-100 shadow-sm px-3 py-2">
       <div class="flex flex-wrap gap-1">
         <button v-for="tab in dashboardTabs" :key="tab.id"
-          @click="activeTab = tab.id"
+          @click="changeTab(tab.id)"
           :class="['px-3 py-1.5 font-semibold text-xs rounded-lg transition-all duration-150 whitespace-nowrap flex items-center gap-1.5',
             activeTab === tab.id
               ? 'bg-primary-600 text-white shadow-sm'
@@ -178,9 +178,24 @@ const dashboardTabs = [
   { id: 'settings', label: 'Job Alert Settings' }
 ]
 
-const activeTab = ref('profile')
+const route = useRoute()
+const router = useRouter()
 
-const { data: stats, refresh: refreshStats } = await useFetch<any>('http://127.0.0.1:8000/api/applicant/dashboard-stats', {
+const activeTab = ref(route.query.tab ? String(route.query.tab) : 'profile')
+
+const changeTab = (tabId: string) => {
+  activeTab.value = tabId
+  router.push({ query: { ...route.query, tab: tabId } })
+}
+
+import { watch } from 'vue'
+watch(() => route.query.tab, (newTab) => {
+  if (newTab && typeof newTab === 'string') {
+    activeTab.value = newTab
+  }
+})
+
+const { data: stats, refresh: refreshStats } = await useFetch<any>('/api/applicant/dashboard-stats', {
   headers: { Authorization: `Bearer ${authStore.token}` },
   server: false
 })

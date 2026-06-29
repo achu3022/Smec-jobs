@@ -104,7 +104,7 @@ const successMsg = ref('')
 const showUploadForm = ref(false)
 const uploadForm = ref({ type: 'Resume' })
 
-const { data: documents, pending, refresh } = await useFetch<any[]>('http://127.0.0.1:8000/api/applicant/documents', {
+const { data: documents, pending, refresh } = await useFetch<any[]>('/api/applicant/documents', {
   headers: { Authorization: `Bearer ${authStore.token}` }
 })
 
@@ -124,7 +124,7 @@ const handleUpload = async () => {
   successMsg.value = ''
 
   try {
-    await $fetch('http://127.0.0.1:8000/api/applicant/resume', {
+    await $fetch('/api/applicant/resume', {
       method: 'POST',
       headers: { Authorization: `Bearer ${authStore.token}` },
       body: formData
@@ -142,7 +142,7 @@ const handleUpload = async () => {
 
 const makeDefault = async (id: number) => {
   try {
-    await $fetch(`http://127.0.0.1:8000/api/applicant/documents/${id}/default`, {
+    await $fetch(`/api/applicant/documents/${id}/default`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
@@ -156,7 +156,7 @@ const deleteDoc = async (id: number) => {
   if (!confirm('Are you sure you want to delete this document?')) return
   
   try {
-    await $fetch(`http://127.0.0.1:8000/api/applicant/documents/${id}`, {
+    await $fetch(`/api/applicant/documents/${id}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${authStore.token}` }
     })

@@ -20,7 +20,7 @@ class ReportController extends Controller
             'Expires' => '0',
         ];
 
-        $callback = function () use ($type) {
+        $callback = function () use ($type, $request) {
             $file = fopen('php://output', 'w');
             
             if ($type === 'users') {

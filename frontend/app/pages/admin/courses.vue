@@ -168,7 +168,7 @@ const form = ref({
 const fetchCourses = async () => {
   pending.value = true
   try {
-    const res: any = await $fetch('http://127.0.0.1:8000/api/admin/courses', {
+    const res: any = await $fetch('/api/admin/courses', {
       headers: { Authorization: `Bearer ${authStore.token}` },
       query: { search: searchQuery.value, page: page.value }
     })
@@ -182,7 +182,7 @@ const fetchCourses = async () => {
 
 const fetchCategories = async () => {
   try {
-    const res: any = await $fetch('http://127.0.0.1:8000/api/admin/course-categories', {
+    const res: any = await $fetch('/api/admin/course-categories', {
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
     categories.value = res
@@ -217,13 +217,13 @@ const saveCourse = async () => {
   isSaving.value = true
   try {
     if (form.value.id) {
-      await $fetch(`http://127.0.0.1:8000/api/admin/courses/${form.value.id}`, {
+      await $fetch(`/api/admin/courses/${form.value.id}`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${authStore.token}` },
         body: form.value
       })
     } else {
-      await $fetch('http://127.0.0.1:8000/api/admin/courses', {
+      await $fetch('/api/admin/courses', {
         method: 'POST',
         headers: { Authorization: `Bearer ${authStore.token}` },
         body: form.value
@@ -241,7 +241,7 @@ const saveCourse = async () => {
 const deleteCourse = async (id: number) => {
   if (!confirm('Are you sure you want to delete this course?')) return
   try {
-    await $fetch(`http://127.0.0.1:8000/api/admin/courses/${id}`, {
+    await $fetch(`/api/admin/courses/${id}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${authStore.token}` }
     })

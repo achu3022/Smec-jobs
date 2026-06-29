@@ -130,7 +130,7 @@ const form = ref({
 const fetchAlerts = async () => {
   pending.value = true
   try {
-    const data: any = await $fetch('http://127.0.0.1:8000/api/applicant/job-alerts', {
+    const data: any = await $fetch('/api/applicant/job-alerts', {
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
     alerts.value = data.alerts || []
@@ -144,7 +144,7 @@ const fetchAlerts = async () => {
 const saveAlert = async () => {
   isSaving.value = true
   try {
-    await $fetch('http://127.0.0.1:8000/api/applicant/job-alerts', {
+    await $fetch('/api/applicant/job-alerts', {
       method: 'POST',
       headers: { Authorization: `Bearer ${authStore.token}` },
       body: form.value
@@ -165,7 +165,7 @@ const toggleAlert = async (id: number) => {
     // Optimistic update
     alerts.value[alertIndex].email_alerts_active = !alerts.value[alertIndex].email_alerts_active
     try {
-      await $fetch(`http://127.0.0.1:8000/api/applicant/job-alerts/${id}/toggle`, {
+      await $fetch(`/api/applicant/job-alerts/${id}/toggle`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${authStore.token}` }
       })
@@ -179,7 +179,7 @@ const toggleAlert = async (id: number) => {
 const deleteAlert = async (id: number) => {
   if (!confirm('Are you sure you want to delete this job alert?')) return
   try {
-    await $fetch(`http://127.0.0.1:8000/api/applicant/job-alerts/${id}`, {
+    await $fetch(`/api/applicant/job-alerts/${id}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${authStore.token}` }
     })
