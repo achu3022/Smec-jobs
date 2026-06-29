@@ -38,12 +38,19 @@
                         {{ new Date(chat.lastMessage.created_at).toLocaleDateString() }}
                       </span>
                     </div>
-                    <p class="text-xs text-slate-500 truncate mb-1">Re: <span class="font-medium">{{ chat.application?.job?.title || 'General' }}</span></p>
-                    <p class="text-xs text-slate-600 truncate" :class="{ 'font-semibold text-slate-900': !chat.lastMessage.read_at && chat.lastMessage.receiver_id === authStore.user?.id }">
-                      {{ chat.lastMessage.sender_id === authStore.user?.id ? 'You: ' : '' }}{{ chat.lastMessage.content }}
-                    </p>
+                  <div class="flex justify-between items-end">
+                    <div class="min-w-0 pr-2">
+                      <p class="text-xs text-slate-500 truncate mb-1">Re: <span class="font-medium">{{ chat.application?.job?.title || 'General' }}</span></p>
+                      <p class="text-xs text-slate-600 truncate" :class="{ 'font-bold text-slate-900': chat.unreadCount > 0 }">
+                        {{ chat.lastMessage.sender_id === authStore.user?.id ? 'You: ' : '' }}{{ chat.lastMessage.content }}
+                      </p>
+                    </div>
+                    <div v-if="chat.unreadCount > 0" class="shrink-0 bg-indigo-600 text-white text-[10px] font-bold h-5 min-w-[20px] px-1.5 rounded-full flex items-center justify-center">
+                      {{ chat.unreadCount }}
+                    </div>
                   </div>
                 </div>
+              </div>
               </li>
             </ul>
           </div>
@@ -126,7 +133,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick, watch } from 'vue'
+import { ref, computed, nextTick, watch, onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from '~/stores/auth'
 
 useSeoMeta({
@@ -161,20 +168,38 @@ const groupedMessages = computed(() => {
         user: otherUser,
         application: msg.application,
         messages: [],
-        lastMessage: null
+        lastMessage: null,
+        unreadCount: 0
       }
     }
     
     groups[otherUserId].messages.push(msg)
-    groups[otherUserId].lastMessage = msg // Last one processed will be the newest due to sort
+    groups[otherUserId].lastMessage = msg 
+    
+    if (!msg.read_at && msg.receiver_id === authStore.user?.id) {
+      groups[otherUserId].unreadCount++
+    }
   })
   
   return groups
 })
 
-const selectChat = (userId: string | number) => {
+const selectChat = async (userId: string | number) => {
   activeChat.value = userId
   scrollToBottom()
+  
+  // Mark as read
+  if (groupedMessages.value[userId]?.unreadCount > 0) {
+    try {
+      await $fetch(`http://127.0.0.1:8000/api/employer/messages/${userId}/read`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${authStore.token}` }
+      })
+      await refresh()
+    } catch (e) {
+      console.error(e)
+    }
+  }
 }
 
 const scrollToBottom = () => {
@@ -214,6 +239,17 @@ watch(messages, () => {
   if (activeChat.value) {
     scrollToBottom()
   }
+})
+
+let pollInterval: any
+onMounted(() => {
+  pollInterval = setInterval(() => {
+    refresh()
+  }, 5000)
+})
+
+onUnmounted(() => {
+  if (pollInterval) clearInterval(pollInterval)
 })
 </script>
 

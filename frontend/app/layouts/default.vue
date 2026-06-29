@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen flex flex-col font-sans">
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <header v-if="!isDashboard" class="bg-white border-b border-slate-200 sticky top-0 z-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <div class="flex items-center gap-2">
           <NuxtLink to="/" class="flex items-center">
@@ -31,7 +31,7 @@
       <slot />
     </main>
 
-    <footer class="bg-white text-slate-600 py-6 border-t border-slate-200">
+    <footer v-if="!isDashboard" class="bg-white text-slate-600 py-6 border-t border-slate-200">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
         <NuxtLink to="/" class="flex items-center">
           <img src="/logo-new.webp" alt="SMECJobs Logo" class="h-6 w-auto grayscale opacity-70 hover:grayscale-0 hover:opacity-100 transition-all" />
@@ -51,10 +51,13 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { useAuthStore } from '~/stores/auth'
-import { useRouter } from '#app'
+import { useRouter, useRoute } from '#app'
 
 const authStore = useAuthStore()
 const router = useRouter()
+const route = useRoute()
+
+const isDashboard = computed(() => route.path.startsWith('/admin') || route.path.startsWith('/employer'))
 
 const dashboardLink = computed(() => {
   if (authStore.user?.role === 'admin') return '/admin/dashboard'
@@ -67,19 +70,7 @@ onMounted(() => {
 })
 
 const logout = async () => {
-  if (authStore.token) {
-    try {
-      await $fetch('http://127.0.0.1:8000/api/logout', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${authStore.token}`
-        }
-      })
-    } catch (e) {
-      // Ignored
-    }
-  }
-  authStore.clearAuth()
+  await authStore.logout()
   router.push('/')
 }
 </script>

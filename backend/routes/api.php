@@ -85,9 +85,12 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         Route::get('/admin/enquiries', [\App\Http\Controllers\Admin\EnquiryController::class, 'index']);
         Route::put('/admin/enquiries/{id}/status', [\App\Http\Controllers\Admin\EnquiryController::class, 'updateStatus']);
         Route::delete('/admin/enquiries/{id}', [\App\Http\Controllers\Admin\EnquiryController::class, 'destroy']);
+        Route::get('/admin/settings', [\App\Http\Controllers\Admin\SettingController::class, 'index']);
+        Route::post('/admin/settings', [\App\Http\Controllers\Admin\SettingController::class, 'store']);
     });
 
     // Applicant Routes
+    Route::get('/applicant/resume', [\App\Http\Controllers\ApplicantController::class, 'getResume']);
     Route::post('/applicant/resume', [\App\Http\Controllers\ApplicantController::class, 'uploadResume']);
     Route::get('/applicant/applications', [\App\Http\Controllers\ApplicantController::class, 'myApplications']);
     Route::get('/applicant/profile', [\App\Http\Controllers\ApplicantController::class, 'getProfile']);
@@ -98,6 +101,21 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::delete('/applicant/experience/{id}', [\App\Http\Controllers\ApplicantController::class, 'deleteExperience']);
     Route::post('/applicant/saved-jobs/{id}', [\App\Http\Controllers\ApplicantController::class, 'toggleSavedJob']);
     Route::get('/applicant/saved-jobs', [\App\Http\Controllers\ApplicantController::class, 'getSavedJobs']);
+    Route::get('/applicant/recommended-jobs', [\App\Http\Controllers\ApplicantController::class, 'getRecommendedJobs']);
+    Route::get('/applicant/interviews', [\App\Http\Controllers\ApplicantController::class, 'getInterviews']);
+    Route::get('/applicant/job-alerts', [\App\Http\Controllers\ApplicantController::class, 'getJobAlerts']);
+    Route::post('/applicant/job-alerts', [\App\Http\Controllers\ApplicantController::class, 'storeJobAlert']);
+    Route::post('/applicant/job-alerts/{id}/toggle', [\App\Http\Controllers\ApplicantController::class, 'toggleJobAlert']);
+    Route::delete('/applicant/job-alerts/{id}', [\App\Http\Controllers\ApplicantController::class, 'deleteJobAlert']);
+    Route::get('/applicant/dashboard-stats', [\App\Http\Controllers\ApplicantController::class, 'getDashboardStats']);
+    Route::get('/applicant/notifications', [\App\Http\Controllers\ApplicantController::class, 'getNotifications']);
+    Route::post('/applicant/notifications/read-all', [\App\Http\Controllers\ApplicantController::class, 'markAllNotificationsRead']);
+    Route::get('/applicant/messages', [\App\Http\Controllers\ApplicantController::class, 'getMessages']);
+    Route::post('/applicant/messages', [\App\Http\Controllers\ApplicantController::class, 'sendMessage']);
+    Route::post('/applicant/messages/{senderId}/read', [\App\Http\Controllers\ApplicantController::class, 'markAsRead']);
+    Route::get('/applicant/documents', [\App\Http\Controllers\ApplicantController::class, 'getDocuments']);
+    Route::delete('/applicant/documents/{id}', [\App\Http\Controllers\ApplicantController::class, 'deleteDocument']);
+    Route::post('/applicant/documents/{id}/default', [\App\Http\Controllers\ApplicantController::class, 'makeDocumentDefault']);
     Route::post('/jobs/{job}/apply', [\App\Http\Controllers\ApplicantController::class, 'apply']);
 
     // Employer Profile & Dashboard
@@ -118,8 +136,11 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
     Route::get('/employer/candidates/saved', [\App\Http\Controllers\EmployerController::class, 'getSavedCandidates']);
     Route::post('/employer/candidates/saved', [\App\Http\Controllers\EmployerController::class, 'toggleSavedCandidate']);
     Route::get('/employer/interviews', [\App\Http\Controllers\EmployerController::class, 'getInterviews']);
+    Route::put('/employer/interviews/{id}/status', [\App\Http\Controllers\EmployerController::class, 'updateInterviewStatus']);
     Route::get('/employer/messages', [\App\Http\Controllers\EmployerController::class, 'getMessages']);
     Route::post('/employer/messages', [\App\Http\Controllers\EmployerController::class, 'sendMessage']);
+    Route::post('/employer/messages/{senderId}/read', [\App\Http\Controllers\EmployerController::class, 'markAsRead']);
+    Route::get('/employer/reports', [\App\Http\Controllers\EmployerController::class, 'getReports']);
 });
 
 // Public endpoints

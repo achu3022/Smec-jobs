@@ -9,6 +9,7 @@ use App\Models\Job;
 use App\Models\Company;
 use App\Models\Application;
 use App\Models\CourseEnquiry;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -21,15 +22,54 @@ class DashboardController extends Controller
         $newRegistrations = User::whereDate('created_at', today())->count();
         $courseEnquiries = CourseEnquiry::count();
 
+        // 7-day registration trend
+        $registrationTrend = [];
+        $categories = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = Carbon::today()->subDays($i);
+            $categories[] = $date->format('M d');
+            $count = User::whereDate('created_at', $date)->count();
+            $registrationTrend[] = $count;
+        }
+
+        // Applications by status
+        $applicationsByStatus = Application::selectRaw('status, count(*) as count')
+            ->groupBy('status')
+            ->pluck('count', 'status')
+            ->toArray();
+            
+        // Map status to values for Donut chart
+        $statusLabels = ['pending', 'reviewed', 'shortlisted', 'rejected', 'hired'];
+        $statusSeries = [];
+        foreach ($statusLabels as $status) {
+            $statusSeries[] = $applicationsByStatus[$status] ?? 0;
+        }
+
+        // Recent Users
+        $recentUsers = User::orderBy('created_at', 'desc')->take(5)->get();
+
         return response()->json([
-            'jobSeekers' => $jobSeekers,
-            'employers' => $employers,
-            'activeJobs' => $activeJobs,
-            'applicationsToday' => $applicationsToday,
-            'newRegistrations' => $newRegistrations,
-            'revenue' => '₹0', // Placeholder
-            'courseEnquiries' => $courseEnquiries,
-            'recentActivities' => 0, // Placeholder
+            'stats' => [
+                'jobSeekers' => $jobSeekers,
+                'employers' => $employers,
+                'activeJobs' => $activeJobs,
+                'applicationsToday' => $applicationsToday,
+                'newRegistrations' => $newRegistrations,
+                'revenue' => '₹0', // Placeholder
+                'courseEnquiries' => $courseEnquiries,
+                'recentActivities' => 0, // Placeholder
+            ],
+            'charts' => [
+                'registrations' => [
+                    'series' => [['name' => 'New Users', 'data' => $registrationTrend]],
+                    'categories' => $categories
+                ],
+                'applications' => [
+                    'series' => $statusSeries,
+                    'labels' => ['Pending', 'Reviewed', 'Shortlisted', 'Rejected', 'Hired']
+                ]
+            ],
+            'recentUsers' => $recentUsers
         ]);
     }
 }

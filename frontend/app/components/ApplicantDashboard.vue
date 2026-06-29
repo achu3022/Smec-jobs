@@ -38,10 +38,10 @@
         <div class="relative z-10 mt-3">
           <div class="flex justify-between items-center mb-1">
             <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Profile</span>
-            <span class="text-xs font-black text-white bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700">45%</span>
+            <span class="text-xs font-black text-white bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700">{{ stats?.profile_completion || 0 }}%</span>
           </div>
           <div class="w-full bg-slate-800/80 rounded-full h-1.5 overflow-hidden border border-slate-700/50">
-            <div class="bg-gradient-to-r from-green-500 to-emerald-400 h-full rounded-full shadow-[0_0_8px_rgba(52,211,153,0.5)] transition-all duration-1000" style="width: 45%"></div>
+            <div class="bg-gradient-to-r from-green-500 to-emerald-400 h-full rounded-full shadow-[0_0_8px_rgba(52,211,153,0.5)] transition-all duration-1000" :style="`width: ${stats?.profile_completion || 0}%`"></div>
           </div>
         </div>
       </div>
@@ -89,7 +89,7 @@
           </div>
           <div class="min-w-0">
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-none mb-1">Interviews</p>
-            <span class="text-xl font-black text-slate-900 leading-none">0</span>
+            <span class="text-xl font-black text-slate-900 leading-none">{{ stats?.upcoming_interviews || 0 }}</span>
             <p class="text-[10px] text-slate-500 font-bold mt-1">Upcoming</p>
           </div>
         </div>
@@ -102,7 +102,7 @@
           </div>
           <div class="min-w-0">
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-none mb-1">Total Applied</p>
-            <span class="text-xl font-black text-slate-900 leading-none">0</span>
+            <span class="text-xl font-black text-slate-900 leading-none">{{ stats?.total_applied || 0 }}</span>
             <p class="text-[10px] text-slate-500 font-bold mt-1">Lifetime</p>
           </div>
         </div>
@@ -115,12 +115,18 @@
       <div class="flex flex-wrap gap-1">
         <button v-for="tab in dashboardTabs" :key="tab.id"
           @click="activeTab = tab.id"
-          :class="['px-3 py-1.5 font-semibold text-xs rounded-lg transition-all duration-150 whitespace-nowrap',
+          :class="['px-3 py-1.5 font-semibold text-xs rounded-lg transition-all duration-150 whitespace-nowrap flex items-center gap-1.5',
             activeTab === tab.id
               ? 'bg-primary-600 text-white shadow-sm'
               : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100']"
         >
           {{ tab.label }}
+          <span v-if="tab.id === 'messages' && stats?.unread_messages > 0" class="flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white">
+            {{ stats.unread_messages }}
+          </span>
+          <span v-if="tab.id === 'notifications' && stats?.unread_notifications > 0" class="flex h-4 min-w-[16px] items-center justify-center rounded-full bg-amber-500 px-1 text-[9px] font-bold text-white">
+            {{ stats.unread_notifications }}
+          </span>
         </button>
       </div>
     </div>
@@ -129,18 +135,13 @@
     <div class="min-h-[400px]">
       <StudentProfileTab v-if="activeTab === 'profile'" />
       <StudentResumeTab v-if="activeTab === 'resume'" />
-      <StudentSearchJobsTab v-if="activeTab === 'search_jobs'" />
       <StudentRecommendedTab v-if="activeTab === 'recommended'" />
       <StudentSavedJobsTab v-if="activeTab === 'saved'" />
       <StudentAppliedJobsTab v-if="activeTab === 'applications'" />
       <StudentInterviewsTab v-if="activeTab === 'interviews'" />
-      <StudentCoursesTab v-if="activeTab === 'courses'" />
-      <StudentGuidanceTab v-if="activeTab === 'guidance'" />
-      <StudentAlertsTab v-if="activeTab === 'alerts'" />
       <StudentMessagesTab v-if="activeTab === 'messages'" />
       <StudentNotificationsTab v-if="activeTab === 'notifications'" />
       <StudentDocumentsTab v-if="activeTab === 'documents'" />
-      <StudentActivityTab v-if="activeTab === 'activity'" />
       <StudentSettingsTab v-if="activeTab === 'settings'" />
     </div>
 
@@ -153,18 +154,13 @@ import { useAuthStore } from '~/stores/auth'
 
 import StudentProfileTab from '~/components/student/ProfileTab.vue'
 import StudentResumeTab from '~/components/student/ResumeTab.vue'
-import StudentSearchJobsTab from '~/components/student/SearchJobsTab.vue'
 import StudentRecommendedTab from '~/components/student/RecommendedTab.vue'
 import StudentSavedJobsTab from '~/components/student/SavedJobsTab.vue'
 import StudentAppliedJobsTab from '~/components/student/AppliedJobsTab.vue'
 import StudentInterviewsTab from '~/components/student/InterviewsTab.vue'
-import StudentCoursesTab from '~/components/student/CoursesTab.vue'
-import StudentGuidanceTab from '~/components/student/GuidanceTab.vue'
-import StudentAlertsTab from '~/components/student/AlertsTab.vue'
 import StudentMessagesTab from '~/components/student/MessagesTab.vue'
 import StudentNotificationsTab from '~/components/student/NotificationsTab.vue'
 import StudentDocumentsTab from '~/components/student/DocumentsTab.vue'
-import StudentActivityTab from '~/components/student/ActivityTab.vue'
 import StudentSettingsTab from '~/components/student/SettingsTab.vue'
 
 const authStore = useAuthStore()
@@ -172,23 +168,34 @@ const authStore = useAuthStore()
 const dashboardTabs = [
   { id: 'profile', label: 'My Profile' },
   { id: 'resume', label: 'Resume' },
-  { id: 'search_jobs', label: 'Search Jobs' },
   { id: 'recommended', label: 'Recommended Jobs' },
   { id: 'saved', label: 'Saved Jobs' },
   { id: 'applications', label: 'Applied Jobs' },
   { id: 'interviews', label: 'Interviews' },
-  { id: 'courses', label: 'SMECLABS Courses' },
-  { id: 'guidance', label: 'Career Guidance' },
-  { id: 'alerts', label: 'Job Alerts' },
   { id: 'messages', label: 'Messages' },
   { id: 'notifications', label: 'Notifications' },
   { id: 'documents', label: 'Documents' },
-  { id: 'activity', label: 'Activity History' },
-  { id: 'settings', label: 'Settings' }
+  { id: 'settings', label: 'Job Alert Settings' }
 ]
 
 const activeTab = ref('profile')
 
+const { data: stats, refresh: refreshStats } = await useFetch<any>('http://127.0.0.1:8000/api/applicant/dashboard-stats', {
+  headers: { Authorization: `Bearer ${authStore.token}` },
+  server: false
+})
+
+let pollInterval: any
+import { onMounted, onUnmounted } from 'vue'
+onMounted(() => {
+  pollInterval = setInterval(() => {
+    refreshStats()
+  }, 5000)
+})
+
+onUnmounted(() => {
+  if (pollInterval) clearInterval(pollInterval)
+})
 </script>
 
 <style scoped>

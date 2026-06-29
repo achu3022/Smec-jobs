@@ -35,5 +35,21 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  return { user, token, isAuthenticated, setAuth, clearAuth, initAuth }
+  const logout = async () => {
+    if (token.value) {
+      try {
+        await $fetch('http://127.0.0.1:8000/api/logout', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token.value}`
+          }
+        })
+      } catch (e) {
+        // Ignored, token might already be invalid
+      }
+    }
+    clearAuth()
+  }
+
+  return { user, token, isAuthenticated, setAuth, clearAuth, initAuth, logout }
 })

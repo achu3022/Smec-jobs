@@ -197,8 +197,17 @@ class EmployerController extends Controller
             return response()->json(['message' => 'Unauthorized action'], 403);
         }
 
+        $oldStatus = $application->status;
+        
         $application->status = $request->status;
         $application->save();
+
+        // Automatically mark any scheduled interviews as completed when the application advances to a new stage
+        if ($oldStatus !== $request->status) {
+            \App\Models\Interview::where('application_id', $application->id)
+                ->where('status', 'scheduled')
+                ->update(['status' => 'completed']);
+        }
 
         // Trigger Notification to Applicant
         \App\Models\SystemNotification::create([
@@ -391,6 +400,43 @@ class EmployerController extends Controller
         return response()->json(['message' => 'Interview scheduled successfully', 'interview' => $interview]);
     }
 
+    public function updateInterviewStatus(Request $request, $id)
+    {
+        if ($request->user()->role !== 'employer') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $interview = \App\Models\Interview::findOrFail($id);
+        
+        // Verify employer owns this interview
+        $company = Company::where('user_id', $request->user()->id)->first();
+        if (!$company || $interview->application->job->company_id !== $company->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'status' => 'required|in:scheduled,completed,cancelled'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $interview->status = $request->status;
+        $interview->save();
+
+        // Optional: Notify applicant about status change
+        \App\Models\SystemNotification::create([
+            'user_id' => $interview->application->user_id,
+            'title' => 'Interview Status Updated',
+            'message' => 'Your interview for ' . $interview->application->job->title . ' has been marked as ' . $request->status . '.',
+            'type' => 'info',
+            'link' => '/applicant/interviews'
+        ]);
+
+        return response()->json(['message' => 'Interview status updated successfully', 'interview' => $interview]);
+    }
+
     public function getMessages(Request $request)
     {
         if ($request->user()->role !== 'employer') {
@@ -431,6 +477,20 @@ class EmployerController extends Controller
         ]);
 
         return response()->json(['message' => 'Message sent successfully', 'data' => $message]);
+    }
+
+    public function markAsRead(Request $request, $senderId)
+    {
+        if ($request->user()->role !== 'employer') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        \App\Models\Message::where('receiver_id', $request->user()->id)
+            ->where('sender_id', $senderId)
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+
+        return response()->json(['message' => 'Messages marked as read']);
     }
     public function updateJob(Request $request, $id)
     {
@@ -566,11 +626,13 @@ class EmployerController extends Controller
 
         $todayInterviews = \App\Models\Interview::whereHas('application.job', function($q) use ($company) {
             $q->where('company_id', $company->id);
-        })->whereDate('scheduled_at', \Carbon\Carbon::today())->count();
+        })->where('status', 'scheduled')
+          ->whereDate('scheduled_at', \Carbon\Carbon::today())->count();
 
         $upcomingInterviews = \App\Models\Interview::whereHas('application.job', function($q) use ($company) {
             $q->where('company_id', $company->id);
-        })->where('scheduled_at', '>=', \Carbon\Carbon::now())->count();
+        })->where('status', 'scheduled')
+          ->where('scheduled_at', '>=', \Carbon\Carbon::now())->count();
 
         $unreadMessages = \App\Models\Message::where('receiver_id', $request->user()->id)
             ->whereNull('read_at')->count();
@@ -596,16 +658,110 @@ class EmployerController extends Controller
             ->take(5)
             ->get();
 
+        // 7-day application trend
+        $applicationTrend = [];
+        $categories = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = \Carbon\Carbon::today()->subDays($i);
+            $categories[] = $date->format('M d');
+            $count = \App\Models\Application::whereHas('job', function($q) use ($company) {
+                $q->where('company_id', $company->id);
+            })->whereDate('created_at', $date)->count();
+            $applicationTrend[] = $count;
+        }
+
+        // Applications by status pipeline
+        $applicationsByStatus = \App\Models\Application::selectRaw('status, count(*) as count')
+            ->whereHas('job', function($q) use ($company) {
+                $q->where('company_id', $company->id);
+            })
+            ->groupBy('status')
+            ->pluck('count', 'status')
+            ->toArray();
+            
+        // Map status to values for Donut chart
+        $statusLabels = ['pending', 'reviewed', 'shortlisted', 'rejected', 'hired'];
+        $statusSeries = [];
+        foreach ($statusLabels as $status) {
+            $statusSeries[] = $applicationsByStatus[$status] ?? 0;
+        }
+
         return response()->json([
-            'active_jobs' => $activeJobsCount,
-            'total_applications' => $totalApplications,
-            'shortlisted' => $shortlistedCount,
-            'today_interviews' => $todayInterviews,
-            'upcoming_interviews' => $upcomingInterviews,
-            'new_messages' => $unreadMessages,
-            'unread_notifications' => $unreadNotifications,
-            'profile_completion' => $profileCompletion,
+            'stats' => [
+                'active_jobs' => $activeJobsCount,
+                'total_applications' => $totalApplications,
+                'shortlisted' => $shortlistedCount,
+                'today_interviews' => $todayInterviews,
+                'upcoming_interviews' => $upcomingInterviews,
+                'new_messages' => $unreadMessages,
+                'unread_notifications' => $unreadNotifications,
+                'profile_completion' => $profileCompletion,
+            ],
+            'charts' => [
+                'applications' => [
+                    'series' => [['name' => 'Applications', 'data' => $applicationTrend]],
+                    'categories' => $categories
+                ],
+                'pipeline' => [
+                    'series' => $statusSeries,
+                    'labels' => ['Pending', 'Reviewed', 'Shortlisted', 'Rejected', 'Hired']
+                ]
+            ],
             'recent_applications' => $recentApplications
+        ]);
+    }
+
+    public function getReports(Request $request)
+    {
+        if ($request->user()->role !== 'employer') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $company = Company::where('user_id', $request->user()->id)->first();
+        if (!$company) {
+            return response()->json(['message' => 'Company profile not found'], 404);
+        }
+
+        $jobs = Job::where('company_id', $company->id)
+            ->withCount(['applications as total_applications'])
+            ->withCount(['applications as shortlisted_applications' => function ($query) {
+                $query->where('status', 'shortlisted');
+            }])
+            ->withCount(['applications as hired_applications' => function ($query) {
+                $query->where('status', 'hired');
+            }])
+            ->get();
+
+        $totalApplications = $jobs->sum('total_applications');
+        $totalHires = $jobs->sum('hired_applications');
+        
+        $hiringRate = 0;
+        if ($totalApplications > 0) {
+            $hiringRate = round(($totalHires / $totalApplications) * 100, 1);
+        }
+
+        // Job Popularity Chart Data
+        $chartData = [
+            'categories' => [],
+            'series' => []
+        ];
+
+        // Sort jobs by application count for the chart
+        $sortedJobs = $jobs->sortByDesc('total_applications')->take(10);
+        foreach ($sortedJobs as $job) {
+            $chartData['categories'][] = substr($job->title, 0, 15) . (strlen($job->title) > 15 ? '...' : '');
+            $chartData['series'][] = $job->total_applications;
+        }
+
+        return response()->json([
+            'kpis' => [
+                'total_jobs' => $jobs->count(),
+                'total_applications' => $totalApplications,
+                'total_hires' => $totalHires,
+                'hiring_rate' => $hiringRate,
+            ],
+            'chart' => $chartData,
+            'job_performance' => $jobs
         ]);
     }
 }

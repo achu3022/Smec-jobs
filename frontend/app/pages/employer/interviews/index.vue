@@ -29,9 +29,9 @@
             
             <!-- Date/Time Box -->
             <div class="flex-shrink-0 w-24 h-24 bg-indigo-50 rounded-2xl flex flex-col items-center justify-center border border-indigo-100">
-              <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">{{ new Date(interview.scheduled_at).toLocaleString('default', { month: 'short' }) }}</span>
-              <span class="text-2xl font-black text-indigo-900">{{ new Date(interview.scheduled_at).getDate() }}</span>
-              <span class="text-[10px] font-semibold text-slate-500 mt-1">{{ new Date(interview.scheduled_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }}</span>
+              <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">{{ new Date(interview.scheduled_at).toLocaleString('en-US', { timeZone: 'Asia/Kolkata', month: 'short' }) }}</span>
+              <span class="text-2xl font-black text-indigo-900">{{ new Date(interview.scheduled_at).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata', day: 'numeric' }) }}</span>
+              <span class="text-[10px] font-semibold text-slate-500 mt-1">{{ new Date(interview.scheduled_at).toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' }) }} IST</span>
             </div>
 
             <div class="flex-1 min-w-0">
@@ -54,13 +54,20 @@
             </div>
 
             <!-- Actions -->
-            <div class="flex gap-2 shrink-0">
-              <button @click="openApplicantModal(interview.application, true)" class="bg-white border border-slate-200 hover:border-slate-300 text-slate-700 font-bold py-2 px-4 rounded-xl transition-colors text-sm">
-                Reschedule
-              </button>
-              <button @click="openApplicantModal(interview.application)" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold py-2 px-4 rounded-xl transition-colors text-sm">
-                View Profile
-              </button>
+            <div class="flex flex-col gap-2 shrink-0 md:items-end">
+              <select :value="interview.status" @change="updateStatus(interview, $event)" class="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-full p-2.5 outline-none font-medium">
+                <option value="scheduled">Scheduled</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+              <div class="flex gap-2 w-full mt-1">
+                <button @click="openApplicantModal(interview.application, true)" class="flex-1 bg-white border border-slate-200 hover:border-slate-300 text-slate-700 font-bold py-2 px-3 rounded-xl transition-colors text-xs text-center">
+                  Reschedule
+                </button>
+                <button @click="openApplicantModal(interview.application)" class="flex-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold py-2 px-3 rounded-xl transition-colors text-xs text-center">
+                  Profile
+                </button>
+              </div>
             </div>
             
           </li>
@@ -102,5 +109,23 @@ const openApplicantModal = (app: any, openInterview = false) => {
   selectedApplicant.value = app
   autoOpenInterview.value = openInterview
   isModalOpen.value = true
+}
+
+const updateStatus = async (interview: any, event: Event) => {
+  const newStatus = (event.target as HTMLSelectElement).value
+  const oldStatus = interview.status
+  interview.status = newStatus // Optimistic UI update
+
+  try {
+    await $fetch(`http://127.0.0.1:8000/api/employer/interviews/${interview.id}/status`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${authStore.token}` },
+      body: { status: newStatus }
+    })
+  } catch (error) {
+    console.error('Failed to update interview status', error)
+    interview.status = oldStatus // Revert on failure
+    alert('Failed to update status. Please try again.')
+  }
 }
 </script>

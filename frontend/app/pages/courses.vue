@@ -28,7 +28,9 @@
       </div>
       
       <div v-else-if="filteredCourses.length === 0" class="text-center py-20">
-        <div class="text-6xl mb-4">🎓</div>
+        <div class="mb-6 flex justify-center text-primary-500">
+          <Icon name="lucide:graduation-cap" class="w-20 h-20" />
+        </div>
         <h3 class="text-2xl font-bold text-slate-800 mb-2">No courses found</h3>
         <p class="text-slate-500">Try adjusting your search terms.</p>
       </div>

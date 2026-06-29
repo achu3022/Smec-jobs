@@ -1,5 +1,5 @@
 <template>
-  <div class="flex min-h-screen bg-gray-50">
+  <div class="flex h-screen bg-gray-50 overflow-hidden">
     <AdminSidebar />
     <div class="flex-1 p-8 overflow-y-auto">
       <div class="flex justify-between items-center mb-8">
@@ -44,8 +44,8 @@
       <div v-else class="grid grid-cols-1 gap-6">
         <div v-for="category in mappings" :key="category.id" class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
           <div class="p-5 border-b border-slate-100 bg-slate-50 flex items-center gap-3">
-            <div class="w-10 h-10 bg-primary-100 text-primary-600 rounded-lg flex items-center justify-center font-bold">
-              💼
+            <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center font-bold">
+              <Icon name="lucide:briefcase" class="w-5 h-5" />
             </div>
             <h3 class="text-xl font-bold text-slate-800">{{ category.name }}</h3>
             <span class="ml-auto bg-slate-200 text-slate-600 text-xs font-bold px-3 py-1 rounded-full">
@@ -60,7 +60,9 @@
             <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div v-for="course in category.course_categories" :key="course.id" class="flex justify-between items-center p-4 border border-slate-200 rounded-xl hover:border-primary-300 transition-colors bg-white shadow-sm">
                 <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 bg-blue-50 text-blue-500 rounded-lg flex items-center justify-center text-sm">🎓</div>
+                  <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-lg flex-shrink-0">
+                    <Icon name="lucide:graduation-cap" class="w-4 h-4" />
+                  </div>
                   <span class="font-semibold text-slate-700">{{ course.name }}</span>
                 </div>
                 <button @click="deleteMapping(category.id, course.id)" class="text-slate-400 hover:text-red-500 p-2 transition-colors rounded-lg hover:bg-red-50" title="Remove Mapping">

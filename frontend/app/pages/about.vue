@@ -14,7 +14,7 @@
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-10">
         <div class="bg-primary-50 rounded-3xl p-8 border border-primary-100">
           <div class="w-12 h-12 bg-primary-600 rounded-2xl flex items-center justify-center mb-5">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <Icon name="lucide:target" class="w-6 h-6 text-white" />
           </div>
           <h2 class="text-2xl font-black text-slate-900 mb-3">Our Mission</h2>
           <p class="text-slate-600 leading-relaxed">To empower job seekers with the right tools, training, and connections to land their dream careers, while helping employers discover pre-qualified, motivated candidates efficiently.</p>
@@ -61,11 +61,11 @@
 useHead({ title: 'About Us — SMECJobs' })
 
 const features = [
-  { icon: '🎯', title: 'Targeted Job Matching', desc: 'Smart filters and category-based search help you find roles that actually fit your skills and goals.' },
-  { icon: '🏢', title: 'Verified Employers', desc: 'Every company on the platform is reviewed to ensure candidates connect with legitimate, quality employers.' },
-  { icon: '📄', title: 'Resume Builder', desc: 'Create and manage a professional resume directly within your applicant dashboard.' },
-  { icon: '🎓', title: 'Integrated Training', desc: 'Access SMECLABS courses to upskill and increase your chances of getting hired faster.' },
-  { icon: '📅', title: 'Interview Scheduling', desc: 'Employers can schedule interviews directly through the platform, keeping everything in one place.' },
-  { icon: '🔔', title: 'Job Alerts', desc: 'Set up alerts for your preferred roles and get notified the moment a matching job is posted.' },
+  { icon: 'lucide:target', title: 'Targeted Job Matching', desc: 'Smart filters and category-based search help you find roles that actually fit your skills and goals.' },
+  { icon: 'lucide:building', title: 'Verified Employers', desc: 'Every company on the platform is reviewed to ensure candidates connect with legitimate, quality employers.' },
+  { icon: 'lucide:file-text', title: 'Resume Builder', desc: 'Create and manage a professional resume directly within your applicant dashboard.' },
+  { icon: 'lucide:graduation-cap', title: 'Integrated Training', desc: 'Access SMECLABS courses to upskill and increase your chances of getting hired faster.' },
+  { icon: 'lucide:calendar', title: 'Interview Scheduling', desc: 'Employers can schedule interviews directly through the platform, keeping everything in one place.' },
+  { icon: 'lucide:bell', title: 'Job Alerts', desc: 'Set up alerts for your preferred roles and get notified the moment a matching job is posted.' },
 ]
 </script>

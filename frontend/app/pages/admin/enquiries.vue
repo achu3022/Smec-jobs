@@ -1,5 +1,5 @@
 <template>
-  <div class="flex min-h-screen bg-gray-50">
+  <div class="flex h-screen bg-gray-50 overflow-hidden">
     <AdminSidebar />
     <div class="flex-1 p-8 overflow-y-auto">
       <div class="flex justify-between items-center mb-8">
@@ -62,8 +62,8 @@
 
         <template #actions-cell="{ item }">
           <div class="flex justify-end gap-2">
-            <button @click="deleteEnquiry(item.id)" class="p-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-colors" title="Delete Permanently">
-              🗑️
+            <button @click="deleteEnquiry(item.id)" class="p-2 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
+              <Icon name="lucide:trash-2" class="w-5 h-5 text-rose-500" />
             </button>
           </div>
         </template>

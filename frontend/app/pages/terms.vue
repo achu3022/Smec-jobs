@@ -19,14 +19,12 @@
           </div>
 
           <div v-for="section in sections" :key="section.title" class="bg-slate-50 rounded-2xl p-8 border border-slate-100">
-            <h2 class="text-xl font-black text-slate-900 mb-3 flex items-center gap-2">
-              <span class="text-primary-600">{{ section.icon }}</span> {{ section.title }}
-            </h2>
+            <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0 mb-4">
+              <Icon :name="section.icon" class="w-6 h-6" />
+            </div>
+            <h2 class="text-xl font-black text-slate-900 mb-3">{{ section.title }}</h2>
             <div class="text-slate-600 text-sm leading-relaxed space-y-3">
-              <p v-for="(para, i) in section.content" :key="i">{{ para }}</p>
-              <ul v-if="section.list" class="list-disc list-inside space-y-1.5 text-slate-600">
-                <li v-for="(item, i) in section.list" :key="i">{{ item }}</li>
-              </ul>
+              <p>{{ section.content }}</p>
             </div>
           </div>
 
@@ -45,78 +43,44 @@ useHead({ title: 'Terms of Service — SMECJobs' })
 
 const sections = [
   {
-    icon: '🌐',
-    title: '1. Use of the Platform',
-    content: [
-      'SMECJobs provides an online platform connecting job seekers and employers. You may use the platform only for lawful purposes and in accordance with these terms.',
-      'You must be at least 18 years of age to create an account on SMECJobs.',
-    ]
+    icon: 'lucide:globe',
+    title: '1. Acceptance of Terms',
+    content: 'By accessing or using the SMEC Jobs platform, you agree to be bound by these Terms and Conditions. If you do not agree with any part of these terms, you may not use our services.'
   },
   {
-    icon: '👤',
-    title: '2. Accounts & Registration',
-    content: [
-      'You are responsible for maintaining the confidentiality of your account credentials. All activity under your account is your responsibility.',
-      'You agree to provide accurate and complete information when registering and to keep it updated.',
-      'We reserve the right to suspend or terminate accounts that violate these terms or that contain false information.',
-    ]
+    icon: 'lucide:user',
+    title: '2. User Accounts',
+    content: 'You are responsible for maintaining the confidentiality of your account credentials. You agree to provide accurate, current, and complete information during registration and to update such information to keep it accurate.'
   },
   {
-    icon: '🚫',
-    title: '3. Prohibited Conduct',
-    content: ['You agree not to:'],
-    list: [
-      'Post false, misleading, or fraudulent job listings or profiles.',
-      'Harass, spam, or send unsolicited messages to other users.',
-      'Scrape, copy, or redistribute platform content without permission.',
-      'Attempt to gain unauthorised access to any part of the platform.',
-      'Use the platform for any illegal activity or to facilitate illegal employment.',
-    ]
+    icon: 'lucide:ban',
+    title: '3. Acceptable Use',
+    content: 'You agree not to use the platform for any unlawful purpose, to post false or misleading information, to harass other users, or to attempt to gain unauthorized access to our systems.'
   },
   {
-    icon: '📄',
-    title: '4. Job Listings & Applications',
-    content: [
-      'Employers are solely responsible for the accuracy and legality of their job listings. SMECJobs does not guarantee the quality, safety, or availability of any job posted.',
-      'SMECJobs does not guarantee employment to any applicant. We facilitate connections but are not a party to any employment contract.',
-    ]
+    icon: 'lucide:file-text',
+    title: '4. Content and Postings',
+    content: 'Users are solely responsible for the content they post (resumes, job listings). SMEC Jobs reserves the right to remove any content that violates these terms or is deemed inappropriate.'
   },
   {
-    icon: '🎓',
-    title: '5. Courses & Training',
-    content: [
-      'Course listings are provided by SMECLABS. Enrollment, fees, and delivery are governed by SMECLABS terms and conditions separately communicated at the time of enrollment.',
-    ]
+    icon: 'lucide:graduation-cap',
+    title: '5. Training and Courses',
+    content: 'Enrollment in SMECLABS courses through the platform is subject to separate terms and conditions provided at the time of enrollment. Course availability and pricing are subject to change.'
   },
   {
-    icon: '©️',
-    title: '6. Intellectual Property',
-    content: [
-      'All content, design, and technology on SMECJobs is owned by or licensed to SMECLABS. You may not reproduce, distribute, or create derivative works without explicit written permission.',
-      'By uploading a resume or profile, you grant SMECJobs a non-exclusive licence to display and share that content with relevant employers on the platform.',
-    ]
+    icon: 'lucide:scale',
+    title: '6. Limitation of Liability',
+    content: 'SMEC Jobs acts as a platform to connect employers and candidates. We do not guarantee employment, the accuracy of job listings, or the quality of candidates. We are not liable for any damages arising from your use of the platform.'
   },
   {
-    icon: '⚖️',
-    title: '7. Limitation of Liability',
-    content: [
-      'SMECJobs is provided "as is" without warranties of any kind. We are not liable for any indirect, incidental, or consequential damages arising from your use of the platform.',
-      'Our total liability for any claim is limited to the amount you paid to access the platform in the three months prior to the claim.',
-    ]
+    icon: 'lucide:edit',
+    title: '7. Modifications to Terms',
+    content: 'We reserve the right to modify these terms at any time. Continued use of the platform following any changes constitutes your acceptance of the new terms.'
   },
   {
-    icon: '✏️',
-    title: '8. Changes to Terms',
-    content: [
-      'We may update these Terms of Service at any time. Continued use of the platform after changes are posted constitutes your acceptance of the revised terms.',
-    ]
-  },
-  {
-    icon: '🏛️',
-    title: '9. Governing Law',
-    content: [
-      'These terms are governed by the laws of India. Any disputes arising from your use of SMECJobs shall be subject to the exclusive jurisdiction of the courts in Kerala, India.',
-    ]
-  },
+    icon: 'lucide:building',
+    title: '8. Governing Law',
+    content: 'These terms shall be governed by and construed in accordance with the laws of India. Any disputes shall be subject to the exclusive jurisdiction of the courts in Kerala, India.'
+  }
 ]
 </script>

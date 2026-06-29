@@ -1,5 +1,5 @@
 <template>
-  <div class="flex min-h-screen bg-gray-50">
+  <div class="flex h-screen bg-gray-50 overflow-hidden">
     <AdminSidebar />
     <div class="flex-1 p-8 overflow-y-auto">
       <div class="flex justify-between items-center mb-8">
@@ -60,17 +60,17 @@
 
         <template #actions-cell="{ item }">
           <div class="flex justify-end gap-2">
-            <button @click="openModal(item)" class="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors" title="Edit Job">
-              ✏️
+            <button @click="openModal(item)" class="p-2 hover:bg-slate-100 rounded-lg transition-colors" title="Edit Job">
+              <Icon name="lucide:pencil" class="w-5 h-5 text-blue-500" />
             </button>
             <button @click="toggleFeatured(item.id)" class="p-2 rounded-lg bg-yellow-50 hover:bg-yellow-100 text-yellow-600 transition-colors" :title="item.is_featured ? 'Remove Featured' : 'Mark Featured'">
-              ⭐
+              <Icon name="lucide:star" class="w-5 h-5" />
             </button>
             <button @click="toggleStatus(item)" class="p-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors" :title="item.is_active ? 'Close Job' : 'Activate Job'">
-              {{ item.is_active ? '⏸️' : '▶️' }}
+              <Icon :name="item.is_active ? 'lucide:pause-circle' : 'lucide:play-circle'" class="w-5 h-5" />
             </button>
-            <button @click="deleteJob(item.id)" class="p-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-colors" title="Delete Permanently">
-              🗑️
+            <button @click="deleteJob(item.id)" class="p-2 hover:bg-red-50 rounded-lg transition-colors" title="Delete Job">
+              <Icon name="lucide:trash-2" class="w-5 h-5 text-rose-500" />
             </button>
           </div>
         </template>

@@ -15,7 +15,9 @@
         <!-- Contact Info -->
         <div class="lg:col-span-2 space-y-6">
           <div v-for="info in contactInfo" :key="info.label" class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex items-start gap-4">
-            <div class="w-10 h-10 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center shrink-0 text-lg">{{ info.icon }}</div>
+            <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center flex-shrink-0 text-xl shadow-inner">
+              <Icon :name="info.icon" class="w-6 h-6" />
+            </div>
             <div>
               <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">{{ info.label }}</p>
               <p class="text-slate-800 font-semibold text-sm">{{ info.value }}</p>
@@ -28,7 +30,9 @@
           <h2 class="text-2xl font-black text-slate-900 mb-6">Send us a message</h2>
 
           <div v-if="submitted" class="bg-green-50 border border-green-200 text-green-700 rounded-2xl p-6 text-center">
-            <div class="text-4xl mb-3">✅</div>
+            <div class="mb-3 text-emerald-500">
+              <Icon name="lucide:check-circle" class="w-10 h-10 mx-auto" />
+            </div>
             <h3 class="font-bold text-lg mb-1">Message Sent!</h3>
             <p class="text-sm">Thanks for reaching out. We'll get back to you within 1–2 business days.</p>
           </div>
@@ -83,10 +87,10 @@ const submitted = ref(false)
 const error = ref('')
 
 const contactInfo = [
-  { icon: '📍', label: 'Address', value: 'SMECLABS, Kerala, India' },
-  { icon: '📧', label: 'Email', value: 'support@smecjobs.com' },
-  { icon: '📞', label: 'Phone', value: '+91 98765 43210' },
-  { icon: '🕐', label: 'Working Hours', value: 'Mon – Sat, 9:00 AM – 6:00 PM' },
+  { icon: 'lucide:map-pin', label: 'Address', value: 'SMECLABS, Kerala, India' },
+  { icon: 'lucide:mail', label: 'Email', value: 'support@smecjobs.com' },
+  { icon: 'lucide:phone', label: 'Phone', value: '+91 98765 43210' },
+  { icon: 'lucide:clock', label: 'Working Hours', value: 'Mon – Sat, 9:00 AM – 6:00 PM' },
 ]
 
 const submitForm = async () => {

@@ -6,7 +6,25 @@
       <!-- Upload Section -->
       <div class="space-y-6">
         <div class="bg-slate-50 rounded-3xl shadow-sm border border-slate-100 p-8">
-          <h4 class="text-lg font-bold text-slate-900 mb-6">Upload Resume</h4>
+          <h4 class="text-lg font-bold text-slate-900 mb-6">Your Resume</h4>
+          
+          <!-- Current Resume Preview -->
+          <div v-if="currentResume" class="mb-6 bg-white border border-slate-200 rounded-2xl p-6 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-red-50 text-red-500 rounded-xl flex items-center justify-center shrink-0">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+              </div>
+              <div class="overflow-hidden">
+                <h5 class="font-bold text-slate-900 truncate max-w-[200px]" :title="currentResume.file_path.split('/').pop()">{{ currentResume.file_path.split('/').pop() }}</h5>
+                <p class="text-xs text-slate-500 mt-0.5">Uploaded on {{ new Date(currentResume.created_at).toLocaleDateString() }}</p>
+              </div>
+            </div>
+            <button @click="showPdfModal = true" class="text-primary-600 hover:text-primary-800 font-bold text-sm bg-primary-50 hover:bg-primary-100 px-4 py-2 rounded-lg transition-colors">
+              Preview
+            </button>
+          </div>
+
+          <h4 class="text-sm font-bold text-slate-900 mb-4">{{ currentResume ? 'Update Resume' : 'Upload Resume' }}</h4>
           <div v-if="uploadSuccess" class="mb-6 bg-green-50 text-green-700 p-4 rounded-xl text-sm border border-green-100">
             Resume uploaded securely.
           </div>
@@ -40,9 +58,27 @@
           </div>
           <h4 class="text-lg font-bold text-slate-900 mb-2">Build Resume Online</h4>
           <p class="text-sm text-slate-500 mb-6">Create a professional resume in minutes using our free online builder. This feature is coming soon.</p>
-          <button disabled class="opacity-50 cursor-not-allowed bg-slate-100 text-slate-600 font-bold py-3 px-4 rounded-xl">
-            Coming Soon
-          </button>
+          <NuxtLink to="/student/resume-builder" class="bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-4 rounded-xl transition-colors inline-block">
+            Build Resume Now
+          </NuxtLink>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PDF Viewer Modal -->
+  <div v-if="showPdfModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-slate-900/50 backdrop-blur-sm" @click.self="showPdfModal = false">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden">
+      <div class="flex justify-between items-center p-4 border-b border-slate-100">
+        <h3 class="font-bold text-slate-900">Resume Preview</h3>
+        <button @click="showPdfModal = false" class="text-slate-400 hover:text-red-500 p-2 rounded-lg transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+      <div class="flex-1 bg-slate-100 p-4 overflow-hidden relative min-h-[60vh]">
+        <iframe v-if="currentResume?.file_url" :src="currentResume.file_url" class="w-full h-full border-0 rounded-lg"></iframe>
+        <div v-else class="flex items-center justify-center h-full text-slate-500">
+          Preview not available.
         </div>
       </div>
     </div>
@@ -50,10 +86,28 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useAuthStore } from '~/stores/auth'
 
 const authStore = useAuthStore()
+
+const currentResume = ref<any>(null)
+const showPdfModal = ref(false)
+
+const fetchResume = async () => {
+  try {
+    const data: any = await $fetch('http://127.0.0.1:8000/api/applicant/resume', {
+      headers: { Authorization: `Bearer ${authStore.token}` }
+    })
+    currentResume.value = data.resume
+  } catch (e) {
+    console.error('Failed to fetch resume', e)
+  }
+}
+
+onMounted(() => {
+  fetchResume()
+})
 
 const fileInput = ref<HTMLInputElement | null>(null)
 const selectedFile = ref<File | null>(null)
@@ -88,6 +142,7 @@ const handleUpload = async () => {
     uploadSuccess.value = true
     selectedFile.value = null
     if (fileInput.value) fileInput.value.value = ''
+    fetchResume()
   } catch (e: any) {
     uploadError.value = e.data?.message || 'Failed to upload resume. Please try again.'
   } finally {

@@ -20,7 +20,8 @@ class ApplicantController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'resume' => 'required|file|mimes:pdf,doc,docx|max:5120', // 5MB max
+            'resume' => 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120', // 5MB max
+            'document_type' => 'nullable|string|max:255'
         ]);
 
         if ($validator->fails()) {
@@ -29,14 +30,37 @@ class ApplicantController extends Controller
 
         $file = $request->file('resume');
         $path = $file->store('resumes', 'public');
+        $docType = $request->document_type ?? 'Resume';
 
         $resume = Resume::create([
             'user_id' => $request->user()->id,
             'file_path' => $path,
-            'is_default' => true,
+            'document_type' => $docType,
+            'is_default' => $docType === 'Resume' ? true : false,
         ]);
 
-        return response()->json(['message' => 'Resume uploaded successfully', 'resume' => $resume], 201);
+        // Only allow one default Resume. If this is a Resume, unset others.
+        if ($docType === 'Resume') {
+            Resume::where('user_id', $request->user()->id)
+                ->where('id', '!=', $resume->id)
+                ->update(['is_default' => false]);
+        }
+
+        return response()->json(['message' => 'Document uploaded successfully', 'resume' => $resume], 201);
+    }
+
+    public function getResume(Request $request)
+    {
+        if ($request->user()->role !== 'applicant') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $resume = Resume::where('user_id', $request->user()->id)->where('is_default', true)->latest()->first();
+        if ($resume) {
+            $resume->file_url = asset('storage/' . $resume->file_path);
+        }
+
+        return response()->json(['resume' => $resume]);
     }
 
     public function myApplications(Request $request)
@@ -74,7 +98,7 @@ class ApplicantController extends Controller
             'user_id' => $request->user()->id,
             'job_id' => $jobId,
             'resume_id' => $resume->id,
-            'status' => 'Pending'
+            'status' => 'new'
         ]);
 
         $application->load(['job.company.user']);
@@ -113,7 +137,7 @@ class ApplicantController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $data = $request->except(['photo']);
+        $data = $request->except(['photo', 'photo_url', 'id', 'user_id', 'created_at', 'updated_at']);
 
         $profile = \App\Models\ApplicantProfile::where('user_id', $request->user()->id)->first();
         $photoPath = $profile ? $profile->photo : null;
@@ -213,5 +237,311 @@ class ApplicantController extends Controller
 
         $savedJobs = $request->user()->savedJobs()->with(['company', 'category'])->get();
         return response()->json(['saved_jobs' => $savedJobs]);
+    }
+
+    public function getRecommendedJobs(Request $request)
+    {
+        if ($request->user()->role !== 'applicant') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $alerts = \App\Models\JobAlert::where('user_id', $request->user()->id)->get();
+        
+        if ($alerts->isEmpty()) {
+            return response()->json(['jobs' => []]);
+        }
+
+        $query = \App\Models\Job::query()->with(['company', 'category'])->where('is_active', true);
+
+        $query->where(function($q) use ($alerts) {
+            foreach ($alerts as $alert) {
+                $q->orWhere(function($subQ) use ($alert) {
+                    if ($alert->keyword) {
+                        $subQ->where(function($kQ) use ($alert) {
+                            $kQ->where('title', 'like', '%' . $alert->keyword . '%')
+                               ->orWhere('description', 'like', '%' . $alert->keyword . '%');
+                        });
+                    }
+                    if ($alert->location) {
+                        $subQ->where('location', 'like', '%' . $alert->location . '%');
+                    }
+                    if ($alert->job_type) {
+                        $subQ->where('employment_type', $alert->job_type);
+                    }
+                    if ($alert->industry) {
+                        $subQ->whereHas('category', function($catQ) use ($alert) {
+                            $catQ->where('name', 'like', '%' . $alert->industry . '%');
+                        });
+                    }
+                });
+            }
+        });
+
+        // If the user created an empty alert, it would match everything.
+        // The above query handles that correctly (empty alert = no constraints inside orWhere, so it returns all).
+        
+        $jobs = $query->latest()->take(20)->get();
+
+        return response()->json(['jobs' => $jobs]);
+    }
+
+    public function getInterviews(Request $request)
+    {
+        if ($request->user()->role !== 'applicant') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $interviews = \App\Models\Interview::whereHas('application', function($query) use ($request) {
+            $query->where('user_id', $request->user()->id);
+        })->with(['application.job.company'])->orderBy('scheduled_at', 'asc')->get();
+
+        return response()->json(['interviews' => $interviews]);
+    }
+
+    public function getJobAlerts(Request $request)
+    {
+        if ($request->user()->role !== 'applicant') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+        $alerts = \App\Models\JobAlert::where('user_id', $request->user()->id)->get();
+        return response()->json(['alerts' => $alerts]);
+    }
+
+    public function storeJobAlert(Request $request)
+    {
+        if ($request->user()->role !== 'applicant') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $validated = $request->validate([
+            'keyword' => 'nullable|string',
+            'location' => 'nullable|string',
+            'job_type' => 'nullable|string',
+            'industry' => 'nullable|string'
+        ]);
+
+        $alert = \App\Models\JobAlert::create([
+            'user_id' => $request->user()->id,
+            'keyword' => $validated['keyword'] ?? null,
+            'location' => $validated['location'] ?? null,
+            'job_type' => $validated['job_type'] ?? null,
+            'industry' => $validated['industry'] ?? null,
+            'email_alerts_active' => true,
+        ]);
+
+        return response()->json(['message' => 'Job alert created', 'alert' => $alert], 201);
+    }
+
+    public function toggleJobAlert(Request $request, $id)
+    {
+        if ($request->user()->role !== 'applicant') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $alert = \App\Models\JobAlert::where('user_id', $request->user()->id)->findOrFail($id);
+        $alert->email_alerts_active = !$alert->email_alerts_active;
+        $alert->save();
+
+        return response()->json(['message' => 'Job alert updated', 'alert' => $alert]);
+    }
+
+    public function deleteJobAlert(Request $request, $id)
+    {
+        if ($request->user()->role !== 'applicant') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $alert = \App\Models\JobAlert::where('user_id', $request->user()->id)->findOrFail($id);
+        $alert->delete();
+
+        return response()->json(['message' => 'Job alert deleted']);
+    }
+
+    public function getDashboardStats(Request $request)
+    {
+        if ($request->user()->role !== 'applicant') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $userId = $request->user()->id;
+
+        $totalApplied = \App\Models\Application::where('user_id', $userId)->count();
+        
+        $interviews = \App\Models\Interview::whereHas('application', function($q) use ($userId) {
+            $q->where('user_id', $userId);
+        })->where('status', 'scheduled')
+          ->where('scheduled_at', '>=', now())
+          ->count();
+
+        // Calculate profile completion percentage (mock logic based on profile and resume)
+        $profile = \App\Models\ApplicantProfile::where('user_id', $userId)->first();
+        $resume = \App\Models\Resume::where('user_id', $userId)->where('is_default', true)->first();
+        
+        $completion = 0;
+        if ($profile) {
+            $completion += 40; // Base profile
+            if ($profile->photo) $completion += 10;
+            if ($profile->skills) $completion += 10;
+        }
+        if ($resume) {
+            $completion += 40;
+        }
+
+        $unreadMessages = \App\Models\Message::where('receiver_id', $userId)
+            ->whereNull('read_at')
+            ->count();
+
+        $unreadNotifications = \App\Models\SystemNotification::where('user_id', $userId)
+            ->where('is_read', false)
+            ->count();
+
+        return response()->json([
+            'total_applied' => $totalApplied,
+            'upcoming_interviews' => $interviews,
+            'profile_completion' => $completion,
+            'unread_messages' => $unreadMessages,
+            'unread_notifications' => $unreadNotifications
+        ]);
+    }
+
+    public function getMessages(Request $request)
+    {
+        if ($request->user()->role !== 'applicant') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $messages = \App\Models\Message::with(['sender', 'receiver', 'application.job'])
+            ->where('sender_id', $request->user()->id)
+            ->orWhere('receiver_id', $request->user()->id)
+            ->latest()
+            ->get();
+
+        return response()->json($messages);
+    }
+
+    public function sendMessage(Request $request)
+    {
+        if ($request->user()->role !== 'applicant') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'receiver_id' => 'required|exists:users,id',
+            'application_id' => 'nullable|exists:applications,id',
+            'content' => 'required|string'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $message = \App\Models\Message::create([
+            'sender_id' => $request->user()->id,
+            'receiver_id' => $request->receiver_id,
+            'application_id' => $request->application_id,
+            'content' => $request->content
+        ]);
+
+        return response()->json(['message' => 'Message sent successfully', 'data' => $message]);
+    }
+
+    public function markAsRead(Request $request, $senderId)
+    {
+        if ($request->user()->role !== 'applicant') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        \App\Models\Message::where('receiver_id', $request->user()->id)
+            ->where('sender_id', $senderId)
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+
+        return response()->json(['message' => 'Messages marked as read']);
+    }
+
+    public function getNotifications(Request $request)
+    {
+        if ($request->user()->role !== 'applicant') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $userId = $request->user()->id;
+
+        // Automatically delete notifications older than 30 days
+        \App\Models\SystemNotification::where('user_id', $userId)
+            ->where('created_at', '<', now()->subDays(30))
+            ->delete();
+
+        $notifications = \App\Models\SystemNotification::where('user_id', $userId)
+            ->latest()
+            ->paginate(15);
+
+        return response()->json($notifications);
+    }
+
+    public function markAllNotificationsRead(Request $request)
+    {
+        if ($request->user()->role !== 'applicant') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        \App\Models\SystemNotification::where('user_id', $request->user()->id)
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
+
+        return response()->json(['message' => 'All notifications marked as read']);
+    }
+
+    public function getDocuments(Request $request)
+    {
+        if ($request->user()->role !== 'applicant') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $resumes = \App\Models\Resume::where('user_id', $request->user()->id)->latest()->get();
+        foreach ($resumes as $resume) {
+            $resume->file_url = asset('storage/' . $resume->file_path);
+        }
+
+        return response()->json($resumes);
+    }
+
+    public function deleteDocument(Request $request, $id)
+    {
+        if ($request->user()->role !== 'applicant') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $resume = \App\Models\Resume::where('user_id', $request->user()->id)->findOrFail($id);
+        
+        // Delete from storage
+        \Illuminate\Support\Facades\Storage::disk('public')->delete($resume->file_path);
+        $resume->delete();
+
+        // If it was default, make the newest one default
+        if ($resume->is_default) {
+            $newDefault = \App\Models\Resume::where('user_id', $request->user()->id)->latest()->first();
+            if ($newDefault) {
+                $newDefault->update(['is_default' => true]);
+            }
+        }
+
+        return response()->json(['message' => 'Document deleted']);
+    }
+
+    public function makeDocumentDefault(Request $request, $id)
+    {
+        if ($request->user()->role !== 'applicant') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        // Remove default from all others
+        \App\Models\Resume::where('user_id', $request->user()->id)->update(['is_default' => false]);
+        
+        // Set new default
+        $resume = \App\Models\Resume::where('user_id', $request->user()->id)->findOrFail($id);
+        $resume->update(['is_default' => true]);
+
+        return response()->json(['message' => 'Document set as default', 'resume' => $resume]);
     }
 }

@@ -65,7 +65,12 @@
                   </button>
                 </td>
               </tr>
-              <tr v-if="!filteredApplicants || filteredApplicants.length === 0">
+              <tr v-if="pending">
+                <td colspan="6" class="p-12 text-center">
+                  <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+                </td>
+              </tr>
+              <tr v-else-if="!filteredApplicants || filteredApplicants.length === 0">
                 <td colspan="6" class="p-8 text-center text-slate-500 font-medium">
                   No applicants found for this job.
                 </td>
@@ -126,8 +131,9 @@ const queryParams = computed(() => {
   return p.toString() ? `?${p.toString()}` : ''
 })
 
-const { data: applicants, refresh } = await useFetch<any[]>(() => `http://127.0.0.1:8000/api/employer/applications${queryParams.value}`, {
-  headers: { Authorization: `Bearer ${authStore.token}` }
+const { data: applicants, refresh, pending } = await useFetch<any[]>(() => `http://127.0.0.1:8000/api/employer/applications${queryParams.value}`, {
+  headers: { Authorization: `Bearer ${authStore.token}` },
+  server: false
 })
 
 const filteredApplicants = computed(() => applicants.value || [])

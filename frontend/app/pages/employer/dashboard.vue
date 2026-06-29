@@ -1,173 +1,264 @@
 <template>
-  <NuxtLayout name="employer">
-    <div class="space-y-8">
-      <div>
-        <h1 class="text-3xl font-bold text-slate-900 tracking-tight">Dashboard Overview</h1>
-        <p class="text-slate-500 mt-1">Here is what's happening with your job postings today.</p>
-      </div>
-
-      <!-- Stats Grid -->
-      <div v-if="pending" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div v-for="i in 4" :key="i" class="bg-white rounded-2xl p-6 border border-slate-200 animate-pulse h-32"></div>
-      </div>
-      
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- Active Jobs -->
-        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-center justify-between group hover:border-indigo-300 hover:shadow-md transition-all">
-          <div>
-            <p class="text-sm font-semibold text-slate-500 mb-1">Active Jobs</p>
-            <h3 class="text-3xl font-black text-slate-900">{{ stats?.active_jobs || 0 }}</h3>
-          </div>
-          <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-          </div>
-        </div>
-
-        <!-- Total Applications -->
-        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-center justify-between group hover:border-emerald-300 hover:shadow-md transition-all">
-          <div>
-            <p class="text-sm font-semibold text-slate-500 mb-1">Total Applications</p>
-            <h3 class="text-3xl font-black text-slate-900">{{ stats?.total_applications || 0 }}</h3>
-          </div>
-          <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-          </div>
-        </div>
-
-        <!-- Shortlisted -->
-        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-center justify-between group hover:border-amber-300 hover:shadow-md transition-all">
-          <div>
-            <p class="text-sm font-semibold text-slate-500 mb-1">Shortlisted</p>
-            <h3 class="text-3xl font-black text-slate-900">{{ stats?.shortlisted || 0 }}</h3>
-          </div>
-          <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
-          </div>
-        </div>
-
-        <!-- Today's Interviews -->
-        <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-center justify-between group hover:border-rose-300 hover:shadow-md transition-all">
-          <div>
-            <p class="text-sm font-semibold text-slate-500 mb-1">Interviews Today</p>
-            <h3 class="text-3xl font-black text-slate-900">{{ stats?.today_interviews || 0 }}</h3>
-          </div>
-          <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-          </div>
-        </div>
-      </div>
-
-      <!-- Recent Applications & Suggested Actions -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Recent Applications -->
-        <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-          <div class="p-6 border-b border-slate-100 flex items-center justify-between">
-            <h2 class="text-xl font-bold text-slate-800">Recent Applications</h2>
-            <NuxtLink to="/employer/applicants" class="text-sm font-bold text-indigo-600 hover:text-indigo-800">View All</NuxtLink>
-          </div>
-          <div v-if="pending" class="p-10 text-center text-slate-500">Loading...</div>
-          <div v-else-if="!stats?.recent_applications?.length" class="p-10 text-center text-slate-500">
-            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+  <div class="h-[100dvh] bg-slate-50 flex overflow-hidden">
+    <EmployerSidebar />
+    <div class="flex-1 ml-64 flex flex-col h-full relative">
+      <main class="flex-1 overflow-x-hidden p-6 sm:p-10 overflow-y-auto">
+        <div class="max-w-7xl mx-auto space-y-8">
+          <div class="flex justify-between items-end">
+            <div>
+              <h1 class="text-3xl font-bold text-slate-900 tracking-tight">Employer Dashboard</h1>
+              <p class="text-slate-500 mt-1">Overview of your active jobs and candidate pipeline.</p>
             </div>
-            <p class="font-medium">No recent applications found.</p>
-            <p class="text-sm mt-1">Post a new job to start receiving applications.</p>
-            <NuxtLink to="/employer/jobs/create" class="inline-block mt-4 bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg">Post a Job</NuxtLink>
+            <button @click="fetchStats" class="p-2 text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 rounded-lg transition-colors" title="Refresh Data">
+              <Icon name="lucide:refresh-cw" class="w-5 h-5" :class="{ 'animate-spin': pending }" />
+            </button>
           </div>
-          <div v-else>
-            <ul class="divide-y divide-slate-100">
-              <li v-for="app in stats.recent_applications" :key="app.id" class="p-4 hover:bg-slate-50 transition-colors">
-                <div class="flex items-center gap-4">
-                  <div class="w-12 h-12 bg-slate-200 rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center font-bold text-slate-500">
-                    {{ app.user?.name?.charAt(0) || 'U' }}
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <p class="text-sm font-bold text-slate-900 truncate">{{ app.user?.name }}</p>
-                    <p class="text-xs text-slate-500 truncate">Applied for <span class="font-semibold text-slate-700">{{ app.job?.title }}</span></p>
-                  </div>
-                  <div class="text-right">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                      New
-                    </span>
-                    <p class="text-xs text-slate-400 mt-1">{{ new Date(app.created_at).toLocaleDateString() }}</p>
-                  </div>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </div>
 
-        <!-- Secondary Stats & Actions -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-gradient-to-br from-indigo-900 to-slate-900 rounded-2xl shadow-sm p-6 text-white relative overflow-hidden">
-          <div class="absolute -right-10 -top-10 w-40 h-40 bg-indigo-500/20 rounded-full blur-3xl"></div>
-          <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl"></div>
+          <!-- Loading State -->
+          <div v-if="pending" class="flex justify-center py-20">
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-500"></div>
+          </div>
           
-          <div class="relative z-10 space-y-4">
-            <h2 class="text-xl font-bold mb-4">Account Status</h2>
-            
-            <div class="flex items-center gap-4 bg-white/10 p-4 rounded-xl">
-              <div class="flex-1">
-                <p class="text-sm font-medium text-indigo-200 mb-1">Profile Completion</p>
-                <div class="w-full bg-white/20 rounded-full h-2.5">
-                  <div class="bg-indigo-400 h-2.5 rounded-full" :style="{ width: (stats?.profile_completion || 0) + '%' }"></div>
+          <div v-else class="space-y-6">
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <AdminWidget title="Active Jobs" :value="stats.active_jobs" icon="lucide:briefcase" color="indigo" />
+              <AdminWidget title="Total Applications" :value="stats.total_applications" icon="lucide:file-text" color="emerald" />
+              <AdminWidget title="Shortlisted" :value="stats.shortlisted" icon="lucide:star" color="amber" />
+              <AdminWidget title="Interviews Today" :value="stats.today_interviews" icon="lucide:calendar-check" color="rose" />
+            </div>
+
+            <!-- Charts Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <!-- Registration Trend -->
+              <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 lg:col-span-2">
+                <h3 class="text-lg font-bold text-slate-800 mb-4">Application Trend (Last 7 Days)</h3>
+                <ClientOnly>
+                  <apexchart type="area" height="300" :options="areaChartOptions" :series="charts.applications.series"></apexchart>
+                  <template #fallback>
+                    <div class="h-[300px] flex items-center justify-center bg-slate-50 rounded-xl">Loading chart...</div>
+                  </template>
+                </ClientOnly>
+              </div>
+              
+              <!-- Application Status Distribution -->
+              <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <h3 class="text-lg font-bold text-slate-800 mb-4">Candidate Pipeline</h3>
+                <ClientOnly>
+                  <apexchart type="donut" height="300" :options="donutChartOptions" :series="charts.pipeline.series"></apexchart>
+                  <template #fallback>
+                    <div class="h-[300px] flex items-center justify-center bg-slate-50 rounded-xl">Loading chart...</div>
+                  </template>
+                </ClientOnly>
+              </div>
+            </div>
+
+            <!-- Secondary Stats & Actions -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <!-- Recent Applications -->
+              <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                  <h2 class="text-xl font-bold text-slate-800">Recent Applications</h2>
+                  <NuxtLink to="/employer/applicants" class="text-sm font-bold text-indigo-600 hover:text-indigo-800">View All</NuxtLink>
+                </div>
+                <div v-if="!recentApplications.length" class="p-10 text-center text-slate-500">
+                  <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Icon name="lucide:file-x" class="w-8 h-8 text-slate-400" />
+                  </div>
+                  <p class="font-medium">No recent applications found.</p>
+                  <p class="text-sm mt-1">Post a new job to start receiving applications.</p>
+                  <NuxtLink to="/employer/jobs/create" class="inline-block mt-4 bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg">Post a Job</NuxtLink>
+                </div>
+                <div v-else class="overflow-x-auto">
+                  <table class="w-full text-left border-collapse">
+                    <thead>
+                      <tr class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
+                        <th class="p-4 font-bold">Candidate</th>
+                        <th class="p-4 font-bold">Applied For</th>
+                        <th class="p-4 font-bold">Status</th>
+                        <th class="p-4 font-bold">Date</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                      <tr v-for="app in recentApplications" :key="app.id" class="hover:bg-slate-50/80 transition-colors">
+                        <td class="p-4">
+                          <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-indigo-100 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-indigo-700">
+                              {{ app.user?.name?.charAt(0) || 'C' }}
+                            </div>
+                            <div>
+                              <p class="font-bold text-sm text-slate-900">{{ app.user?.name }}</p>
+                              <p class="text-xs text-slate-500">{{ app.user?.email }}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td class="p-4">
+                          <span class="text-sm font-semibold text-slate-700">{{ app.job?.title }}</span>
+                        </td>
+                        <td class="p-4">
+                          <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold" :class="{
+                            'bg-amber-100 text-amber-700': app.status === 'pending',
+                            'bg-blue-100 text-blue-700': app.status === 'reviewed',
+                            'bg-indigo-100 text-indigo-700': app.status === 'shortlisted',
+                            'bg-rose-100 text-rose-700': app.status === 'rejected',
+                            'bg-emerald-100 text-emerald-700': app.status === 'hired'
+                          }">
+                            {{ app.status.charAt(0).toUpperCase() + app.status.slice(1) }}
+                          </span>
+                        </td>
+                        <td class="p-4 text-sm text-slate-500">
+                          {{ new Date(app.created_at).toLocaleDateString() }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
-              <span class="text-lg font-bold">{{ stats?.profile_completion || 0 }}%</span>
-            </div>
 
-            <div class="flex items-center justify-between p-4 bg-white/10 rounded-xl">
-              <div>
-                <p class="font-bold">Unread Messages</p>
-                <p class="text-xs text-indigo-200">From applicants</p>
-              </div>
-              <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-bold text-lg">
-                {{ stats?.new_messages || 0 }}
+              <!-- Profile Completion & Other Stats -->
+              <div class="space-y-6">
+                <!-- Profile Completion -->
+                <div class="bg-gradient-to-br from-indigo-900 to-indigo-800 rounded-2xl p-6 shadow-lg shadow-indigo-900/20 relative overflow-hidden group">
+                  <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-colors"></div>
+                  <div class="relative z-10">
+                    <h3 class="text-lg font-bold text-white mb-1">Profile Completion</h3>
+                    <p class="text-indigo-200 text-sm mb-6">Complete your profile to attract better candidates.</p>
+                    
+                    <div class="flex justify-between items-end mb-2">
+                      <span class="text-4xl font-black text-white">{{ stats.profile_completion }}%</span>
+                    </div>
+                    <div class="w-full bg-indigo-950/50 rounded-full h-3 mb-4 overflow-hidden border border-white/10">
+                      <div class="bg-gradient-to-r from-emerald-400 to-emerald-300 h-3 rounded-full relative" :style="{ width: `${stats.profile_completion}%` }">
+                        <div class="absolute inset-0 bg-white/20 animate-pulse"></div>
+                      </div>
+                    </div>
+                    <NuxtLink v-if="stats.profile_completion < 100" to="/employer/company" class="block text-center w-full bg-white/10 hover:bg-white/20 text-white font-bold py-2 rounded-xl transition-colors backdrop-blur-sm border border-white/10">
+                      Complete Profile
+                    </NuxtLink>
+                  </div>
+                </div>
+
+                <AdminWidget title="Unread Messages" :value="stats.new_messages" icon="lucide:message-square" color="blue" />
+                <AdminWidget title="Upcoming Interviews" :value="stats.upcoming_interviews" icon="lucide:calendar" color="fuchsia" />
               </div>
             </div>
-          </div>
-
-          <div class="relative z-10 space-y-4">
-            <h2 class="text-xl font-bold mb-4">Quick Actions</h2>
-            
-            <NuxtLink to="/employer/jobs/create" class="flex items-center gap-3 p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-colors backdrop-blur-sm">
-              <div class="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
-                <svg class="w-5 h-5 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-              </div>
-              <div>
-                <p class="font-bold text-sm">Post a New Job</p>
-                <p class="text-xs text-indigo-200">Reach thousands of candidates</p>
-              </div>
-            </NuxtLink>
-            
-            <NuxtLink to="/employer/interviews" class="flex items-center gap-3 p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-colors backdrop-blur-sm">
-              <div class="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center relative">
-                <svg class="w-5 h-5 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                <span v-if="stats?.upcoming_interviews" class="absolute -top-1 -right-1 bg-rose-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">{{ stats.upcoming_interviews }}</span>
-              </div>
-              <div>
-                <p class="font-bold text-sm">Upcoming Interviews</p>
-                <p class="text-xs text-indigo-200">View your schedule</p>
-              </div>
-            </NuxtLink>
           </div>
         </div>
-      </div>
+      </main>
     </div>
-  </NuxtLayout>
+  </div>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted, computed } from 'vue'
 import { useAuthStore } from '~/stores/auth'
+import EmployerSidebar from '~/components/EmployerSidebar.vue'
+import AdminWidget from '~/components/AdminWidget.vue'
+
+definePageMeta({ layout: false })
 
 const authStore = useAuthStore()
+const pending = ref(true)
 
-useSeoMeta({
-  title: 'Employer Dashboard | SMECJobs'
+const stats = ref({
+  active_jobs: 0,
+  total_applications: 0,
+  shortlisted: 0,
+  today_interviews: 0,
+  upcoming_interviews: 0,
+  new_messages: 0,
+  unread_notifications: 0,
+  profile_completion: 0
 })
 
-const { data: stats, pending } = await useFetch<any>('http://127.0.0.1:8000/api/employer/dashboard-stats', {
-  headers: {
-    Authorization: authStore.token ? `Bearer ${authStore.token}` : ''
+const recentApplications = ref<any[]>([])
+
+const charts = ref<any>({
+  applications: { series: [], categories: [] },
+  pipeline: { series: [], labels: [] }
+})
+
+// ApexCharts Options
+const areaChartOptions = computed(() => ({
+  chart: {
+    type: 'area',
+    fontFamily: 'inherit',
+    toolbar: { show: false },
+    zoom: { enabled: false }
+  },
+  colors: ['#4f46e5'], // indigo-600
+  dataLabels: { enabled: false },
+  stroke: { curve: 'smooth', width: 3 },
+  fill: {
+    type: 'gradient',
+    gradient: {
+      shadeIntensity: 1,
+      opacityFrom: 0.4,
+      opacityTo: 0,
+      stops: [0, 100]
+    }
+  },
+  xaxis: {
+    categories: charts.value.applications.categories,
+    axisBorder: { show: false },
+    axisTicks: { show: false },
+    labels: { style: { colors: '#64748b' } }
+  },
+  yaxis: {
+    labels: { style: { colors: '#64748b' } }
+  },
+  grid: {
+    borderColor: '#f1f5f9',
+    strokeDashArray: 4,
   }
+}))
+
+const donutChartOptions = computed(() => ({
+  chart: { type: 'donut', fontFamily: 'inherit' },
+  labels: charts.value.pipeline.labels,
+  colors: ['#64748b', '#3b82f6', '#f59e0b', '#ef4444', '#10b981'], // Pending, Reviewed, Shortlisted, Rejected, Hired
+  dataLabels: { enabled: false },
+  plotOptions: {
+    pie: {
+      donut: {
+        size: '70%',
+        labels: {
+          show: true,
+          name: { color: '#64748b' },
+          value: { color: '#0f172a', fontSize: '24px', fontWeight: 'bold' }
+        }
+      }
+    }
+  },
+  legend: { position: 'bottom' },
+  stroke: { show: false }
+}))
+
+const fetchStats = async () => {
+  pending.value = true
+  try {
+    const res: any = await $fetch('http://127.0.0.1:8000/api/employer/dashboard-stats', {
+      headers: { Authorization: `Bearer ${authStore.token}` }
+    })
+    
+    // Backend was updated to return stats, charts, recent_applications
+    if (res.stats) {
+      stats.value = res.stats
+      charts.value = res.charts
+      recentApplications.value = res.recent_applications || []
+    } else {
+      // Fallback if backend wasn't updated
+      stats.value = res
+      recentApplications.value = res.recent_applications || []
+    }
+  } catch (e) {
+    console.error('Failed to fetch stats', e)
+  } finally {
+    pending.value = false
+  }
+}
+
+onMounted(() => {
+  fetchStats()
 })
 </script>

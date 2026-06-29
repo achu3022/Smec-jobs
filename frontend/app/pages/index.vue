@@ -43,23 +43,22 @@
 
           <div v-else class="space-y-4">
             <!-- Job Cards -->
-            <div 
-              v-for="job in jobs?.data" 
-              :key="job.id" 
-              @click="selectedJob = job"
-              :class="['border rounded-xl p-5 cursor-pointer transition-colors relative', selectedJob?.id === job.id ? 'border-primary-600 border-2 shadow-sm bg-blue-50/30' : 'border-slate-300 hover:border-slate-400 bg-white']"
+            <div
+              v-for="job in jobs?.data"
+              :key="job.id"
+              @click="handleCardClick(job)"
+              :class="['border rounded-xl p-5 transition-colors relative block cursor-pointer', selectedJob?.id === job.id ? 'border-primary-600 border-2 shadow-sm bg-blue-50/30' : 'border-slate-300 hover:border-slate-400 bg-white']"
             >
               <div class="flex justify-between items-start mb-1">
-                <NuxtLink :to="`/jobs/${job.uuid}`" class="text-lg font-bold text-slate-900 group-hover:underline decoration-primary-600 block md:hidden">{{ job.title }}</NuxtLink>
-                <h3 class="text-lg font-bold text-slate-900 hidden md:block">{{ job.title }}</h3>
+                <h3 class="text-lg font-bold text-slate-900">{{ job.title }}</h3>
                 <!-- Bookmark Icon placeholder -->
-                <button class="text-slate-400 hover:text-slate-600">
+                <button class="text-slate-400 hover:text-slate-600 shrink-0 ml-2" @click.stop.prevent>
                   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path></svg>
                 </button>
               </div>
               <div class="text-base text-slate-700">{{ job.company.name }}</div>
               <div class="text-sm text-slate-600 mb-3">{{ job.location }}</div>
-              
+
               <!-- Tags -->
               <div class="flex flex-wrap gap-2 mb-4">
                 <span v-if="job.salary_min" class="bg-slate-100 text-slate-800 text-xs font-bold px-2 py-1 rounded flex items-center">
@@ -74,9 +73,16 @@
               <div class="text-sm text-slate-600 line-clamp-2 pl-4 border-l-2 border-slate-200">
                 {{ job.description }}
               </div>
-              
-              <div class="text-xs text-slate-500 mt-4">
-                Posted recently
+
+              <div class="flex items-center justify-between mt-4">
+                <div class="text-xs text-slate-500">
+                  Posted recently
+                </div>
+                <div v-if="isMobile">
+                  <span class="bg-primary-700 text-white text-sm font-bold py-1.5 px-4 rounded-lg inline-block">
+                    Apply now
+                  </span>
+                </div>
               </div>
             </div>
             
@@ -172,10 +178,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, onMounted, onUnmounted, computed } from 'vue'
 import { useAuthStore } from '~/stores/auth'
 
 const authStore = useAuthStore()
+const router = useRouter()
+
+// Detect mobile (below lg = 1024px) — drives card link vs click behaviour
+const isMobile = ref(false)
+const checkMobile = () => { isMobile.value = window.innerWidth < 1024 }
+onMounted(() => { checkMobile(); window.addEventListener('resize', checkMobile) })
+onUnmounted(() => { window.removeEventListener('resize', checkMobile) })
 
 const filters = reactive({
   q: '',
@@ -210,6 +223,14 @@ watch(jobs, (newJobs) => {
 
 const executeSearch = () => {
   execute()
+}
+
+const handleCardClick = (job: any) => {
+  if (isMobile.value) {
+    router.push(`/jobs/${job.uuid}`)
+  } else {
+    selectedJob.value = job
+  }
 }
 
 // Applying for job logic

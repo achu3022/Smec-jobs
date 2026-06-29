@@ -21,6 +21,15 @@
             <label class="block text-sm font-bold text-slate-700 mb-2">Profile Photo</label>
             <input type="file" @change="onPhotoChange" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100">
           </div>
+          <div class="hidden md:block"></div>
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-2">Full Name</label>
+            <input type="text" :value="authStore.user?.name" disabled class="w-full rounded-xl border-slate-300 bg-slate-100 border py-3 px-4 text-slate-500 cursor-not-allowed font-medium">
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-2">Email Address</label>
+            <input type="text" :value="authStore.user?.email" disabled class="w-full rounded-xl border-slate-300 bg-slate-100 border py-3 px-4 text-slate-500 cursor-not-allowed font-medium">
+          </div>
           <div>
             <label class="block text-sm font-bold text-slate-700 mb-2">Father's Name</label>
             <input type="text" v-model="profileForm.father_name" class="w-full rounded-xl border-slate-300 bg-slate-50 border py-3 px-4 focus:ring-primary-500 focus:border-primary-500 text-slate-900">
@@ -54,12 +63,22 @@
           </div>
           <div>
             <label class="block text-sm font-bold text-slate-700 mb-2">Blood Group</label>
-            <input type="text" v-model="profileForm.blood_group" class="w-full rounded-xl border-slate-300 bg-slate-50 border py-3 px-4 focus:ring-primary-500 focus:border-primary-500 text-slate-900">
+            <select v-model="profileForm.blood_group" class="w-full rounded-xl border-slate-300 bg-slate-50 border py-3 px-4 focus:ring-primary-500 focus:border-primary-500 text-slate-900">
+              <option value="">Select Blood Group</option>
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="B-">B-</option>
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
+              <option value="AB+">AB+</option>
+              <option value="AB-">AB-</option>
+            </select>
           </div>
           <!-- Documents -->
           <div>
             <label class="block text-sm font-bold text-slate-700 mb-2">Aadhaar Number</label>
-            <input type="text" v-model="profileForm.aadhaar" class="w-full rounded-xl border-slate-300 bg-slate-50 border py-3 px-4 focus:ring-primary-500 focus:border-primary-500 text-slate-900">
+            <input type="text" v-model="profileForm.aadhaar" maxlength="12" pattern="\d{12}" title="12-digit Aadhaar Number" @input="profileForm.aadhaar = $event.target.value.replace(/\D/g, '').substring(0, 12)" class="w-full rounded-xl border-slate-300 bg-slate-50 border py-3 px-4 focus:ring-primary-500 focus:border-primary-500 text-slate-900">
           </div>
           <div>
             <label class="block text-sm font-bold text-slate-700 mb-2">PAN Number</label>
@@ -157,7 +176,15 @@
           </div>
           <div>
             <label class="block text-sm font-bold text-slate-700 mb-2">Preferred Employment Type</label>
-            <input type="text" v-model="profileForm.pref_employment_type" placeholder="e.g. Full-time, Remote" class="w-full rounded-xl border-slate-300 bg-slate-50 border py-3 px-4 focus:ring-primary-500 focus:border-primary-500 text-slate-900">
+            <select v-model="profileForm.pref_employment_type" class="w-full rounded-xl border-slate-300 bg-slate-50 border py-3 px-4 focus:ring-primary-500 focus:border-primary-500 text-slate-900">
+              <option value="">Select Employment Type</option>
+              <option value="Full-time">Full-time</option>
+              <option value="Part-time">Part-time</option>
+              <option value="Contract">Contract</option>
+              <option value="Freelance">Freelance</option>
+              <option value="Remote">Remote</option>
+              <option value="Internship">Internship</option>
+            </select>
           </div>
           <div class="flex items-center mt-8">
             <input type="checkbox" id="willing_to_relocate" v-model="profileForm.willing_to_relocate" class="h-5 w-5 rounded border-slate-300 text-primary-600 focus:ring-primary-600">
@@ -170,10 +197,47 @@
         </div>
       </section>
 
-      <!-- Future Sections (Skills, Languages, Projects, etc) will go here -->
+      <!-- Additional Details Section -->
       <section>
-        <h4 class="text-xl font-bold text-slate-800 mb-6 border-b pb-2">Additional Details (Coming Soon)</h4>
-        <p class="text-slate-500">Skills, Languages, Projects, Certifications, and Social Links features are currently being built.</p>
+        <h4 class="text-xl font-bold text-slate-800 mb-6 border-b pb-2">Additional Details</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="md:col-span-2">
+            <label class="block text-sm font-bold text-slate-700 mb-2">Skills</label>
+            <div class="w-full rounded-xl border-slate-300 bg-slate-50 border p-2 focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-primary-500 text-slate-900 min-h-[52px] flex flex-wrap gap-2 items-center">
+              <span v-for="(skill, index) in (profileForm.skills || '').split(',').map(s => s.trim()).filter(Boolean)" :key="index" class="bg-primary-100 text-primary-800 text-sm font-bold px-3 py-1 rounded-full flex items-center">
+                {{ skill }}
+                <button type="button" @click="removeSkill(index)" class="ml-2 text-primary-600 hover:text-red-500">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+              </span>
+              <input type="text" v-model="skillInput" @keydown.comma.prevent="addSkill" @keydown.enter.prevent="addSkill" placeholder="Add a skill and press comma..." class="flex-1 bg-transparent border-none focus:ring-0 text-sm p-1 min-w-[150px]">
+            </div>
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-sm font-bold text-slate-700 mb-2">Languages Known</label>
+            <div class="w-full rounded-xl border-slate-300 bg-slate-50 border p-2 focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-primary-500 text-slate-900 min-h-[52px] flex flex-wrap gap-2 items-center">
+              <span v-for="(lang, index) in (profileForm.languages || '').split(',').map(s => s.trim()).filter(Boolean)" :key="index" class="bg-primary-100 text-primary-800 text-sm font-bold px-3 py-1 rounded-full flex items-center">
+                {{ lang }}
+                <button type="button" @click="removeLanguage(index)" class="ml-2 text-primary-600 hover:text-red-500">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+              </span>
+              <input type="text" v-model="languageInput" @keydown.comma.prevent="addLanguage" @keydown.enter.prevent="addLanguage" placeholder="Add a language and press comma..." class="flex-1 bg-transparent border-none focus:ring-0 text-sm p-1 min-w-[150px]">
+            </div>
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-sm font-bold text-slate-700 mb-2">Projects</label>
+            <textarea v-model="profileForm.projects" rows="3" placeholder="Briefly describe your key projects..." class="w-full rounded-xl border-slate-300 bg-slate-50 border py-3 px-4 focus:ring-primary-500 focus:border-primary-500 text-slate-900"></textarea>
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-sm font-bold text-slate-700 mb-2">Certifications</label>
+            <textarea v-model="profileForm.certifications" rows="2" placeholder="List your certifications..." class="w-full rounded-xl border-slate-300 bg-slate-50 border py-3 px-4 focus:ring-primary-500 focus:border-primary-500 text-slate-900"></textarea>
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-sm font-bold text-slate-700 mb-2">Social Links</label>
+            <textarea v-model="profileForm.social_links" rows="2" placeholder="LinkedIn, GitHub, Portfolio URLs..." class="w-full rounded-xl border-slate-300 bg-slate-50 border py-3 px-4 focus:ring-primary-500 focus:border-primary-500 text-slate-900"></textarea>
+          </div>
+        </div>
       </section>
 
       <div class="pt-4 flex justify-end border-t border-slate-100">
@@ -296,6 +360,48 @@ const educations = ref<any[]>([])
 const showAddExperience = ref(false)
 const isSavingExp = ref(false)
 const expForm = ref({ job_role: '', company: '', year: '', is_current: false })
+const fileInput = ref<HTMLInputElement | null>(null)
+
+// Tag Input Handlers
+const skillInput = ref('')
+const languageInput = ref('')
+
+const addSkill = () => {
+  const val = skillInput.value.trim()
+  if (val) {
+    const current = profileForm.value.skills ? profileForm.value.skills.split(',').map((s: string) => s.trim()).filter(Boolean) : []
+    if (!current.includes(val)) {
+      current.push(val)
+      profileForm.value.skills = current.join(', ')
+    }
+  }
+  skillInput.value = ''
+}
+
+const removeSkill = (index: number) => {
+  const current = profileForm.value.skills ? profileForm.value.skills.split(',').map((s: string) => s.trim()).filter(Boolean) : []
+  current.splice(index, 1)
+  profileForm.value.skills = current.join(', ')
+}
+
+const addLanguage = () => {
+  const val = languageInput.value.trim()
+  if (val) {
+    const current = profileForm.value.languages ? profileForm.value.languages.split(',').map((s: string) => s.trim()).filter(Boolean) : []
+    if (!current.includes(val)) {
+      current.push(val)
+      profileForm.value.languages = current.join(', ')
+    }
+  }
+  languageInput.value = ''
+}
+
+const removeLanguage = (index: number) => {
+  const current = profileForm.value.languages ? profileForm.value.languages.split(',').map((s: string) => s.trim()).filter(Boolean) : []
+  current.splice(index, 1)
+  profileForm.value.languages = current.join(', ')
+}
+
 const experiences = ref<any[]>([])
 
 // Fetch user profile data

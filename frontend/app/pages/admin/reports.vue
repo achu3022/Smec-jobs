@@ -1,5 +1,5 @@
 <template>
-  <div class="flex min-h-screen bg-gray-50">
+  <div class="flex h-screen bg-gray-50 overflow-hidden">
     <AdminSidebar />
     <div class="flex-1 p-8 overflow-y-auto">
       <div class="flex justify-between items-center mb-8">

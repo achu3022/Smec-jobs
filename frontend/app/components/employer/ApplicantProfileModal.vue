@@ -125,6 +125,27 @@
                 </form>
               </div>
 
+            <!-- Message Form -->
+            <div v-if="showMessageForm" class="bg-blue-50/50 rounded-2xl p-6 mb-8 border border-blue-100">
+              <h3 class="font-bold text-blue-900 mb-4 border-b border-blue-200 pb-2 flex justify-between items-center">
+                Message Candidate
+                <button @click="showMessageForm = false" class="text-xs text-blue-600 hover:text-blue-800">Cancel</button>
+              </h3>
+              <form @submit.prevent="sendMessage" class="space-y-4">
+                <div v-if="messageError" class="bg-red-50 text-red-600 p-3 rounded-lg text-xs border border-red-100">
+                  {{ messageError }}
+                </div>
+                <div>
+                  <textarea v-model="messageContent" rows="4" required class="block w-full rounded-xl border-slate-300 bg-white border py-3 px-4 text-sm focus:ring-blue-500 focus:border-blue-500 text-slate-900" placeholder="Type your message here..."></textarea>
+                </div>
+                <div class="flex justify-end pt-2">
+                  <button type="submit" :disabled="sendingMessage || !messageContent.trim()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-sm shadow-blue-600/30 transition-colors disabled:opacity-70">
+                    {{ sendingMessage ? 'Sending...' : 'Send Message' }}
+                  </button>
+                </div>
+              </form>
+            </div>
+
             </div>
 
             <!-- Sticky Bottom Actions -->
@@ -133,10 +154,13 @@
                 Close
               </button>
               
-              <div class="flex gap-3" v-if="!showInterviewForm">
+              <div class="flex gap-3" v-if="!showInterviewForm && !showMessageForm">
                 <button @click="emit('saveCandidate', applicant?.user?.id)" class="px-4 py-2 bg-white border border-slate-300 hover:border-amber-400 text-slate-700 hover:text-amber-500 rounded-xl text-sm font-bold shadow-sm transition-colors flex items-center gap-2">
                   <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
                   Save Candidate
+                </button>
+                <button @click="showMessageForm = true" class="px-4 py-2 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-xl text-sm font-bold transition-colors">
+                  Message
                 </button>
                 <button @click="showInterviewForm = true" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold shadow-sm shadow-indigo-600/30 transition-colors">
                   Schedule Interview
@@ -169,6 +193,11 @@ const showInterviewForm = ref(false)
 const scheduling = ref(false)
 const interviewError = ref('')
 
+const showMessageForm = ref(false)
+const sendingMessage = ref(false)
+const messageError = ref('')
+const messageContent = ref('')
+
 const interviewForm = reactive({
   scheduled_at: '',
   type: 'virtual',
@@ -179,10 +208,13 @@ const interviewForm = reactive({
 watch(() => props.isOpen, (newVal) => {
   if (newVal) {
     showInterviewForm.value = props.autoOpenInterview
+    showMessageForm.value = false
     interviewError.value = ''
     interviewForm.scheduled_at = ''
     interviewForm.location = ''
     interviewForm.notes = ''
+    messageContent.value = ''
+    messageError.value = ''
   }
 })
 
@@ -221,6 +253,33 @@ const scheduleInterview = async () => {
     interviewError.value = err.data?.message || 'Failed to schedule interview.'
   } finally {
     scheduling.value = false
+  }
+}
+
+const sendMessage = async () => {
+  if (!props.applicant?.user?.id || !messageContent.value.trim()) return
+  
+  sendingMessage.value = true
+  messageError.value = ''
+  
+  try {
+    await $fetch('http://127.0.0.1:8000/api/employer/messages', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${authStore.token}` },
+      body: {
+        receiver_id: props.applicant.user.id,
+        application_id: props.applicant.id,
+        content: messageContent.value.trim()
+      }
+    })
+    
+    alert('Message sent successfully!')
+    showMessageForm.value = false
+    messageContent.value = ''
+  } catch (err: any) {
+    messageError.value = err.data?.message || 'Failed to send message.'
+  } finally {
+    sendingMessage.value = false
   }
 }
 </script>
